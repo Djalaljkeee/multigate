@@ -3,7 +3,7 @@ title: MultiGate: прослойка подписок для Remnawave
 icon: 🚪
 nav: MultiGate
 keywords: multigate прослойка подписка middleware зеркало hwid устройства грейс маскировка remnawave
-tier: free
+tier: pro
 order: 35
 section: Remnawave
 summary: Российский домен подписки, разбор клиентов по User-Agent, блокировка устройств и грейс для истёкших. Один бинарник рядом с панелью.
