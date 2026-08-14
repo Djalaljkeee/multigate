@@ -1,0 +1,52 @@
+{{define "layout.html"}}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{.Title}} · MultiGate</title>
+<link rel="stylesheet" href="{{.Base}}/static/css/admin.css">
+</head>
+<body class="{{if .Authenticated}}has-chrome{{else}}guest-body{{end}}">
+{{if .Authenticated}}
+<div class="app">
+  <header class="topbar">
+    <button class="menu-toggle" type="button" id="menu-toggle" aria-label="Открыть меню" aria-expanded="false" aria-controls="sidebar">
+      <span></span><span></span><span></span>
+    </button>
+    <div class="brand">MultiGate</div>
+    <span class="mode-badge mode-{{.Mode}}">{{if eq .Mode "panel"}}режим: панель{{else if eq .Mode "mirror"}}режим: зеркало{{else}}режим не задан{{end}}</span>
+    <form class="logout-form" method="post" action="{{.Base}}/logout">
+      <input type="hidden" name="csrf" value="{{.CSRF}}">
+      <button type="submit" class="btn btn-ghost">Выйти</button>
+    </form>
+  </header>
+  <nav class="sidebar" id="sidebar">
+    <a href="{{.Base}}/overview"{{if eq .Active "overview"}} class="active" aria-current="page"{{end}}>Обзор</a>
+    <a href="{{.Base}}/reqlog"{{if eq .Active "reqlog"}} class="active" aria-current="page"{{end}}>Журнал запросов</a>
+    <a href="{{.Base}}/users"{{if eq .Active "users"}} class="active" aria-current="page"{{end}}>Пользователи</a>
+    <a href="{{.Base}}/overrides"{{if eq .Active "overrides"}} class="active" aria-current="page"{{end}}>Блокировки</a>
+    <a href="{{.Base}}/headerrules"{{if eq .Active "headerrules"}} class="active" aria-current="page"{{end}}>Правила заголовков</a>
+    <a href="{{.Base}}/settings"{{if eq .Active "settings"}} class="active" aria-current="page"{{end}}>Настройки</a>
+    <a href="{{.Base}}/about"{{if eq .Active "about"}} class="active" aria-current="page"{{end}}>О системе</a>
+  </nav>
+  <div class="scrim" id="scrim"></div>
+  <main class="content">
+    <h1>{{.Title}}</h1>
+    {{if .Flash}}<p class="flash flash-{{.Flash.Kind}}" role="status">{{.Flash.Text}}</p>{{end}}
+    {{template "content" .}}
+  </main>
+</div>
+{{else}}
+<main class="guest-wrap">
+  <div class="guest-card">
+    <div class="guest-brand">MultiGate</div>
+    {{if .Flash}}<p class="flash flash-{{.Flash.Kind}}" role="status">{{.Flash.Text}}</p>{{end}}
+    {{template "content" .}}
+  </div>
+</main>
+{{end}}
+<script src="{{.Base}}/static/js/admin.js"></script>
+</body>
+</html>
+{{end}}

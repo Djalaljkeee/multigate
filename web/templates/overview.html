@@ -1,0 +1,52 @@
+{{define "content"}}
+<div class="cards">
+  <div class="card">
+    <p class="card-label">Режим работы</p>
+    <p class="card-value">{{if eq .Mode "panel"}}Панель{{else if eq .Mode "mirror"}}Зеркало{{else}}-{{end}}</p>
+  </div>
+  <div class="card">
+    <p class="card-label">Панель Remnawave</p>
+    {{if not .PanelSet}}
+      <p class="card-value card-warn">не настроена</p>
+    {{else if .PanelCallErr}}
+      <p class="card-value card-err">недоступна</p>
+      <p class="card-sub">{{.PanelCallErr}}</p>
+    {{else if .PanelInfo.Reachable}}
+      <p class="card-value card-ok">доступна</p>
+      <p class="card-sub">версия {{.PanelInfo.Version}}</p>
+    {{else}}
+      <p class="card-value card-err">недоступна</p>
+      {{if .PanelInfo.Err}}<p class="card-sub">{{.PanelInfo.Err}}</p>{{end}}
+    {{end}}
+  </div>
+  <div class="card">
+    <p class="card-label">Запросы за 24 часа</p>
+    <p class="card-value">{{.Requests24h}}</p>
+  </div>
+  <div class="card">
+    <p class="card-label">Размер базы</p>
+    <p class="card-value">{{fmtBytes .DBBytes}}</p>
+  </div>
+  <div class="card">
+    <p class="card-label">Потеряно записей журнала</p>
+    <p class="card-value{{if gt .LogDrops 0}} card-warn{{end}}">{{.LogDrops}}</p>
+    {{if gt .LogDrops 0}}<p class="card-sub">буфер журнала переполнялся, база не успевает за нагрузкой</p>{{end}}
+  </div>
+</div>
+
+<h2>Разбивка по приложениям за сутки</h2>
+{{if not .TopApps}}
+  {{template "empty" "За последние сутки запросов не было"}}
+{{else}}
+<div class="table-wrap">
+  <table>
+    <thead><tr><th>Приложение</th><th>Запросов</th></tr></thead>
+    <tbody>
+      {{range .TopApps}}
+      <tr><td>{{if .App}}{{.App}}{{else}}(не определено){{end}}</td><td>{{.Count}}</td></tr>
+      {{end}}
+    </tbody>
+  </table>
+</div>
+{{end}}
+{{end}}

@@ -1,0 +1,23 @@
+{{/* Переиспользуемые куски вёрстки, общие для нескольких страниц. */}}
+
+{{define "pagination"}}
+{{if gt .TotalPages 1}}
+<nav class="pager" aria-label="Страницы">
+  {{if gt .Page 1}}
+    <a href="{{.Path}}?{{if .Query}}{{.Query}}&{{end}}page={{sub .Page 1}}" class="btn btn-sm">Назад</a>
+  {{else}}
+    <span class="btn btn-sm btn-disabled">Назад</span>
+  {{end}}
+  <span class="pager-info">стр. {{.Page}} из {{.TotalPages}}</span>
+  {{if lt .Page .TotalPages}}
+    <a href="{{.Path}}?{{if .Query}}{{.Query}}&{{end}}page={{add .Page 1}}" class="btn btn-sm">Далее</a>
+  {{else}}
+    <span class="btn btn-sm btn-disabled">Далее</span>
+  {{end}}
+</nav>
+{{end}}
+{{end}}
+
+{{define "csrf"}}<input type="hidden" name="csrf" value="{{.}}">{{end}}
+
+{{define "empty"}}<p class="empty">{{.}}</p>{{end}}

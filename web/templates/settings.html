@@ -1,0 +1,189 @@
+{{define "content"}}
+{{if .Error}}<p class="flash flash-err">{{.Error}}</p>{{end}}
+
+<form method="post" action="{{.Base}}/settings" class="form-stack" id="settings-form">
+  {{template "csrf" .CSRF}}
+
+  <fieldset class="form-group">
+    <legend>Режим работы</legend>
+    <label class="field-radio">
+      <input type="radio" name="mode" value="mirror" data-mode-switch {{if eq .Form.Mode "mirror"}}checked{{end}}>
+      <span>Зеркало: прослойка проксирует запросы на внешний домен панели</span>
+    </label>
+    <label class="field-radio">
+      <input type="radio" name="mode" value="panel" data-mode-switch {{if eq .Form.Mode "panel"}}checked{{end}}>
+      <span>Панель: прослойка сама ходит в API Remnawave</span>
+    </label>
+  </fieldset>
+
+  <fieldset class="form-group" data-mode-for="mirror">
+    <legend>Зеркало</legend>
+    <label class="field">
+      <span>Домен origin</span>
+      <input type="text" name="mirror_target" value="{{.Form.MirrorTarget}}" placeholder="panel.example.com">
+    </label>
+  </fieldset>
+
+  <fieldset class="form-group" data-mode-for="panel">
+    <legend>Панель Remnawave</legend>
+    <label class="field">
+      <span>Адрес API панели</span>
+      <input type="text" name="panel_url" value="{{.Form.PanelURL}}" placeholder="https://panel.example.com">
+    </label>
+    <label class="field">
+      <span>Токен API</span>
+      <input type="password" name="panel_token" autocomplete="off" placeholder="{{if .Form.PanelTokenSet}}●●●●●●●● (оставьте пустым, чтобы не менять){{else}}не задан{{end}}">
+    </label>
+    {{if .Form.PanelTokenSet}}
+    <label class="field-check">
+      <input type="checkbox" name="panel_token_clear" value="1">
+      <span>Убрать сохранённый токен</span>
+    </label>
+    {{end}}
+    <label class="field">
+      <span>Таймаут запроса к панели, сек</span>
+      <input type="number" name="upstream_timeout" value="{{.Form.UpstreamTimeout}}" min="1" required>
+    </label>
+  </fieldset>
+
+  <fieldset class="form-group">
+    <legend>Домен прослойки</legend>
+    <label class="field">
+      <span>Домен, на котором работает сама прослойка</span>
+      <input type="text" name="own_domain" value="{{.Form.OwnDomain}}" placeholder="sub.example.com">
+    </label>
+    <label class="field">
+      <span>Адрес страницы подписки</span>
+      <input type="text" name="subpage_url" value="{{.Form.SubPageURL}}" placeholder="необязательно">
+    </label>
+  </fieldset>
+
+  <fieldset class="form-group">
+    <legend>Маскировка</legend>
+    <label class="field-check">
+      <input type="checkbox" name="decoy_enabled" {{if .Form.DecoyEnabled}}checked{{end}}>
+      <span>Отдавать заглушку запросам, непохожим на клиент подписки</span>
+    </label>
+    <label class="field">
+      <span>Оформление заглушки</span>
+      <input type="text" name="decoy_theme" value="{{.Form.DecoyTheme}}" placeholder="blank">
+    </label>
+  </fieldset>
+
+  <fieldset class="form-group">
+    <legend>Журнал запросов</legend>
+    <label class="field-check">
+      <input type="checkbox" name="log_enabled" {{if .Form.LogEnabled}}checked{{end}}>
+      <span>Писать журнал запросов</span>
+    </label>
+    <label class="field">
+      <span>Хранить журнал, дней</span>
+      <input type="number" name="log_keep_days" value="{{.Form.LogKeepDays}}" min="1" required>
+    </label>
+    <label class="field">
+      <span>Доверенные прокси (сети, чьему X-Forwarded-For можно верить)</span>
+      <input type="text" name="trusted_proxies" value="{{.Form.TrustedProxies}}" placeholder="например, 10.0.0.0/8, 172.16.0.0/12">
+    </label>
+    <p class="hint">Список сетей (CIDR) обратных прокси перед прослойкой. Общее решение «доверять ли X-Forwarded-For вообще» для входа в саму админку и антибрутфорса задаётся отдельным флагом при запуске, не этим списком.</p>
+  </fieldset>
+
+  <fieldset class="form-group">
+    <legend>Устройства</legend>
+    <label class="field-check">
+      <input type="checkbox" name="hwid_enforce" {{if .Form.HWIDEnforce}}checked{{end}}>
+      <span>Включить блокировку по HWID (лимит устройств и локальные блокировки начинают действовать)</span>
+    </label>
+  </fieldset>
+
+  <fieldset class="form-group">
+    <legend>Грейс для истёкших</legend>
+    <p class="flash flash-warn">Внимание: это единственная функция на этой странице, которая меняет данные в живой панели Remnawave. Она реально продлевает пользователя через API панели, а не только локальные записи прослойки.</p>
+    <label class="field-check">
+      <input type="checkbox" name="grace_enabled" {{if .Form.GraceEnabled}}checked{{end}}>
+      <span>Включить грейс для пользователей с истёкшим сроком</span>
+    </label>
+    <label class="field">
+      <span>Идентификатор сквада для грейса</span>
+      <input type="text" name="grace_squad" value="{{.Form.GraceSquad}}" placeholder="uuid сквада">
+    </label>
+    <label class="field">
+      <span>Длительность грейса, часов</span>
+      <input type="number" name="grace_hours" value="{{.Form.GraceHours}}" min="1" required>
+    </label>
+  </fieldset>
+
+  <fieldset class="form-group">
+    <legend>Чат поддержки</legend>
+    <label class="field-check">
+      <input type="checkbox" name="chat_enabled" {{if .Form.ChatEnabled}}checked{{end}}>
+      <span>Показывать виджет чата поддержки</span>
+    </label>
+    <label class="field">
+      <span>Токен бота Telegram</span>
+      <input type="password" name="chat_tg_token" autocomplete="off" placeholder="{{if .Form.ChatTGTokenSet}}●●●●●●●● (оставьте пустым, чтобы не менять){{else}}не задан{{end}}">
+    </label>
+    {{if .Form.ChatTGTokenSet}}
+    <label class="field-check">
+      <input type="checkbox" name="chat_tg_token_clear" value="1">
+      <span>Убрать сохранённый токен бота</span>
+    </label>
+    {{end}}
+    <label class="field">
+      <span>Чат, куда падают обращения</span>
+      <input type="text" name="chat_tg_chat" value="{{.Form.ChatTGChat}}" placeholder="id чата или @канал">
+    </label>
+    <label class="field">
+      <span>Адрес API Telegram (зеркало, если api.telegram.org недоступен)</span>
+      <input type="text" name="chat_tg_api_base" value="{{.Form.ChatTGAPIBase}}" placeholder="https://api.telegram.org">
+    </label>
+  </fieldset>
+
+  <fieldset class="form-group">
+    <legend>Вебхуки от панели</legend>
+    <label class="field">
+      <span>Секрет входящих вебхуков</span>
+      <input type="password" name="webhook_secret" autocomplete="off" placeholder="{{if .Form.WebhookSecretSet}}●●●●●●●● (оставьте пустым, чтобы не менять){{else}}не задан{{end}}">
+    </label>
+    {{if .Form.WebhookSecretSet}}
+    <label class="field-check">
+      <input type="checkbox" name="webhook_secret_clear" value="1">
+      <span>Убрать сохранённый секрет</span>
+    </label>
+    {{end}}
+  </fieldset>
+
+  <fieldset class="form-group">
+    <legend>Кэш</legend>
+    <label class="field">
+      <span>Время жизни кэша ответа, сек (0, если выключен)</span>
+      <input type="number" name="cache_ttl" value="{{.Form.CacheTTL}}" min="0" required>
+    </label>
+  </fieldset>
+
+  <fieldset class="form-group">
+    <legend>WireGuard</legend>
+    <label class="field-check">
+      <input type="checkbox" name="wg_pool_enabled" {{if .Form.WGPoolEnabled}}checked{{end}}>
+      <span>Выдавать конфиги WireGuard из пула</span>
+    </label>
+  </fieldset>
+
+  <fieldset class="form-group">
+    <legend>Брендирование</legend>
+    <label class="field">
+      <span>Заголовок профиля по умолчанию</span>
+      <input type="text" name="brand_title" value="{{.Form.BrandTitle}}">
+    </label>
+    <label class="field">
+      <span>Ссылка поддержки по умолчанию</span>
+      <input type="text" name="brand_support_url" value="{{.Form.BrandSupportURL}}">
+    </label>
+    <label class="field">
+      <span>Интервал обновления профиля, часов</span>
+      <input type="number" name="update_interval" value="{{.Form.UpdateInterval}}" min="1" required>
+    </label>
+  </fieldset>
+
+  <button type="submit" class="btn btn-primary">Сохранить</button>
+</form>
+{{end}}

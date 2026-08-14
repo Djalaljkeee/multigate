@@ -1,0 +1,44 @@
+{{define "content"}}
+<p><a href="{{.Base}}/headerrules/new" class="btn btn-primary">Новое правило</a></p>
+
+{{if not .Rules}}
+  {{template "empty" "Правил подмены заголовков пока нет"}}
+{{else}}
+<div class="table-wrap">
+  <table>
+    <thead>
+      <tr>
+        <th>Приоритет</th>
+        <th>Название</th>
+        <th>Включено</th>
+        <th>Приложение</th>
+        <th>ОС</th>
+        <th>UA содержит</th>
+        <th>Заголовки</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      {{range .Rules}}
+      <tr>
+        <td>{{.Priority}}</td>
+        <td><a href="{{$.Base}}/headerrules/{{.ID}}">{{.Name}}</a></td>
+        <td>{{yesno .Enabled}}</td>
+        <td>{{if .MatchApp}}{{.MatchApp}}{{else}}любое{{end}}</td>
+        <td>{{if .MatchOS}}{{.MatchOS}}{{else}}любая{{end}}</td>
+        <td class="mono">{{.MatchUA}}{{if .UARegex}} <span class="tag">regex</span>{{end}}</td>
+        <td>{{len .SetHeader}} задать, {{len .DelHeader}} убрать</td>
+        <td class="row-actions">
+          <a href="{{$.Base}}/headerrules/{{.ID}}" class="btn btn-xs">Править</a>
+          <form method="post" action="{{$.Base}}/headerrules/{{.ID}}/delete" data-confirm="Удалить правило «{{.Name}}»?">
+            {{template "csrf" $.CSRF}}
+            <button type="submit" class="btn btn-xs btn-danger">Удалить</button>
+          </form>
+        </td>
+      </tr>
+      {{end}}
+    </tbody>
+  </table>
+</div>
+{{end}}
+{{end}}

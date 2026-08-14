@@ -1,0 +1,130 @@
+{{define "content"}}
+<p><a href="{{.Base}}/users" class="btn btn-ghost btn-sm">← к списку пользователей</a></p>
+
+{{if .PanelErr}}
+  <p class="flash flash-err">{{.PanelErr}}</p>
+{{else}}
+
+<div class="cards">
+  <div class="card">
+    <p class="card-label">Логин</p>
+    <p class="card-value">{{.User.Username}}</p>
+  </div>
+  <div class="card">
+    <p class="card-label">Статус в панели</p>
+    <p class="card-value">{{.User.Status}}</p>
+  </div>
+  <div class="card">
+    <p class="card-label">Истекает</p>
+    <p class="card-value">{{fmtTime .User.ExpireAt}}</p>
+  </div>
+  <div class="card">
+    <p class="card-label">Трафик</p>
+    <p class="card-value">{{fmtBytes .User.UsedTrafficBytes}}{{if gt .User.TrafficLimitBytes 0}} / {{fmtBytes .User.TrafficLimitBytes}}{{else}} / безлимит{{end}}</p>
+  </div>
+  <div class="card">
+    <p class="card-label">Лимит устройств</p>
+    <p class="card-value">{{.User.HWIDDeviceLimit}}</p>
+  </div>
+  <div class="card">
+    <p class="card-label">Блокировка в прослойке</p>
+    {{if .UserBlocked}}
+      <p class="card-value card-err">заблокирован</p>
+      {{if .BlockReason}}<p class="card-sub">{{.BlockReason}}</p>{{end}}
+    {{else}}
+      <p class="card-value card-ok">не заблокирован</p>
+    {{end}}
+  </div>
+</div>
+
+<dl class="kv">
+  <dt>shortUuid</dt><dd class="mono">{{.User.ShortUUID}}</dd>
+  <dt>uuid</dt><dd class="mono">{{.User.UUID}}</dd>
+  <dt>Email</dt><dd>{{if .User.Email}}{{.User.Email}}{{else}}-{{end}}</dd>
+  <dt>Telegram ID</dt><dd>{{if .User.TelegramID}}{{.User.TelegramID}}{{else}}-{{end}}</dd>
+  <dt>Метка</dt><dd>{{if .User.Tag}}{{.User.Tag}}{{else}}-{{end}}</dd>
+  <dt>Сквады</dt><dd>{{if .SquadNames}}{{range $i, $n := .SquadNames}}{{if $i}}, {{end}}{{$n}}{{end}}{{else}}-{{end}}</dd>
+</dl>
+
+<div class="actions-row">
+  {{if .UserBlocked}}
+  <form method="post" action="{{.Base}}/overrides/{{.BlockID}}/delete" data-confirm="Снять блокировку с пользователя?">
+    {{template "csrf" .CSRF}}
+    <input type="hidden" name="return" value="{{.ReturnTo}}">
+    <button type="submit" class="btn btn-primary">Разблокировать пользователя</button>
+  </form>
+  {{else}}
+  <form method="post" action="{{.Base}}/overrides" class="inline-form" data-confirm="Заблокировать пользователя целиком?">
+    {{template "csrf" .CSRF}}
+    <input type="hidden" name="short_uuid" value="{{.ShortUUID}}">
+    <input type="hidden" name="action" value="block">
+    <input type="hidden" name="return" value="{{.ReturnTo}}">
+    <input type="text" name="reason" placeholder="причина (необязательно)" class="input-sm">
+    <button type="submit" class="btn btn-danger">Заблокировать пользователя</button>
+  </form>
+  {{end}}
+</div>
+
+<h2>Устройства</h2>
+{{if .DevicesErr}}
+  <p class="flash flash-err">{{.DevicesErr}}</p>
+{{else if not .Devices}}
+  {{template "empty" "У пользователя нет зарегистрированных устройств"}}
+{{else}}
+<div class="table-wrap">
+  <table>
+    <thead>
+      <tr>
+        <th>HWID</th>
+        <th>Платформа</th>
+        <th>ОС</th>
+        <th>Модель</th>
+        <th>Приложение</th>
+        <th>Добавлено</th>
+        <th>Блокировка</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      {{range .Devices}}
+      {{$block := index $.BlockedHWIDs .HWID}}
+      <tr>
+        <td class="mono">{{.HWID}}</td>
+        <td>{{.Platform}}</td>
+        <td>{{.OSVersion}}</td>
+        <td>{{.Device}}</td>
+        <td>{{.AppVersion}}</td>
+        <td class="nowrap">{{fmtTime .CreatedAt}}</td>
+        <td>
+          {{if $block.ID}}<span class="tag tag-blocked">заблокировано</span>{{end}}
+        </td>
+        <td class="row-actions">
+          {{if $block.ID}}
+          <form method="post" action="{{$.Base}}/overrides/{{$block.ID}}/delete" data-confirm="Снять блокировку устройства?">
+            {{template "csrf" $.CSRF}}
+            <input type="hidden" name="return" value="{{$.ReturnTo}}">
+            <button type="submit" class="btn btn-xs">Разблокировать</button>
+          </form>
+          {{else}}
+          <form method="post" action="{{$.Base}}/overrides" data-confirm="Заблокировать это устройство?">
+            {{template "csrf" $.CSRF}}
+            <input type="hidden" name="hwid" value="{{.HWID}}">
+            <input type="hidden" name="action" value="block">
+            <input type="hidden" name="return" value="{{$.ReturnTo}}">
+            <button type="submit" class="btn btn-xs btn-danger">Заблокировать</button>
+          </form>
+          {{end}}
+          <form method="post" action="{{$.Base}}/users/{{$.ShortUUID}}/devices/{{.HWID}}/delete" data-confirm="Удалить устройство из панели? Пользователь сможет подключить его заново.">
+            {{template "csrf" $.CSRF}}
+            <button type="submit" class="btn btn-xs btn-danger">Удалить из панели</button>
+          </form>
+        </td>
+      </tr>
+      {{end}}
+    </tbody>
+  </table>
+</div>
+{{end}}
+
+{{end}}
+{{end}}

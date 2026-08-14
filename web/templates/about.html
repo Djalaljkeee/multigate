@@ -1,0 +1,52 @@
+{{define "content"}}
+<dl class="kv">
+  <dt>Версия</dt><dd>{{.Full}}</dd>
+  <dt>Аптайм</dt><dd>{{.Uptime}}</dd>
+  <dt>База данных</dt><dd>{{.Dialect}}, {{fmtBytes .DBBytes}}</dd>
+</dl>
+
+<h2>Таблицы базы</h2>
+<div class="table-wrap">
+  <table>
+    <thead><tr><th>Таблица</th><th>Записей</th></tr></thead>
+    <tbody>
+      {{range .Tables}}
+      <tr><td class="mono">{{.Table}}</td><td>{{.Rows}}</td></tr>
+      {{end}}
+    </tbody>
+  </table>
+</div>
+
+<h2>Панель Remnawave</h2>
+{{if not .PanelSet}}
+  <p class="flash flash-warn">Панель не настроена</p>
+{{else}}
+  <dl class="kv">
+    <dt>Доступность</dt>
+    <dd>
+      {{if .PanelCallErr}}
+        <span class="card-err">недоступна</span>: {{.PanelCallErr}}
+      {{else if .PanelInfo.Reachable}}
+        <span class="card-ok">доступна</span>
+      {{else}}
+        <span class="card-err">недоступна</span>{{if .PanelInfo.Err}}: {{.PanelInfo.Err}}{{end}}
+      {{end}}
+    </dd>
+    <dt>Версия панели</dt><dd>{{if .PanelInfo.Version}}{{.PanelInfo.Version}}{{else}}-{{end}}</dd>
+    <dt>Проверено</dt><dd>{{fmtTime .PanelInfo.CheckedAt}}</dd>
+  </dl>
+
+  {{if .PanelStats}}
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Параметр</th><th>Значение</th></tr></thead>
+      <tbody>
+        {{range $k, $v := .PanelStats}}
+        <tr><td class="mono">{{$k}}</td><td>{{$v}}</td></tr>
+        {{end}}
+      </tbody>
+    </table>
+  </div>
+  {{end}}
+{{end}}
+{{end}}

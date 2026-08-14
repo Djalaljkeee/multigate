@@ -1,0 +1,20 @@
+# Сборка
+/multigate
+/dist/
+*.exe
+
+# Данные рабочей установки: база, конфиги, ключи
+/data/
+*.db
+*.db-wal
+*.db-shm
+*.sqlite
+
+# Локальное окружение
+.env
+*.local.yml
+
+# Служебное
+.DS_Store
+*.log
+/coverage.out

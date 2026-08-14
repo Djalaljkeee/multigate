@@ -1,0 +1,65 @@
+{{define "content"}}
+<h2>Новая блокировка</h2>
+<form method="post" action="{{.Base}}/overrides" class="form-inline">
+  {{template "csrf" .CSRF}}
+  <label class="field field-sm">
+    <span>shortUuid</span>
+    <input type="text" name="short_uuid" placeholder="оставьте пустым для блокировки по HWID">
+  </label>
+  <label class="field field-sm">
+    <span>HWID</span>
+    <input type="text" name="hwid" placeholder="оставьте пустым для блокировки пользователя целиком">
+  </label>
+  <label class="field field-sm">
+    <span>Действие</span>
+    <select name="action">
+      <option value="block">заблокировать</option>
+      <option value="allow">явно разрешить</option>
+    </select>
+  </label>
+  <label class="field field-sm">
+    <span>Причина</span>
+    <input type="text" name="reason" placeholder="необязательно">
+  </label>
+  <button type="submit" class="btn btn-primary">Добавить</button>
+</form>
+
+<h2>Действующие блокировки</h2>
+{{if not .Overrides}}
+  {{template "empty" "Локальных блокировок пока нет"}}
+{{else}}
+<div class="table-wrap">
+  <table>
+    <thead>
+      <tr>
+        <th>shortUuid</th>
+        <th>HWID</th>
+        <th>Действие</th>
+        <th>Причина</th>
+        <th>Создано</th>
+        <th>Автор</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      {{range .Overrides}}
+      <tr>
+        <td class="mono">{{if .ShortUUID}}<a href="{{$.Base}}/users/{{.ShortUUID}}">{{.ShortUUID}}</a>{{end}}</td>
+        <td class="mono">{{.HWID}}</td>
+        <td><span class="tag{{if eq .Action "block"}} tag-blocked{{end}}">{{if eq .Action "block"}}блок{{else}}разрешено{{end}}</span></td>
+        <td>{{.Reason}}</td>
+        <td class="nowrap">{{fmtTime .CreatedAt}}</td>
+        <td>{{.CreatedBy}}</td>
+        <td>
+          <form method="post" action="{{$.Base}}/overrides/{{.ID}}/delete" data-confirm="Снять эту блокировку?">
+            {{template "csrf" $.CSRF}}
+            <button type="submit" class="btn btn-xs btn-danger">Снять</button>
+          </form>
+        </td>
+      </tr>
+      {{end}}
+    </tbody>
+  </table>
+</div>
+{{end}}
+{{end}}

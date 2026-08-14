@@ -1,0 +1,52 @@
+[Unit]
+Description=MultiGate, прослойка подписок для Remnawave
+Documentation=https://github.com/qwe8nxtroud/multigate
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=multigate
+Group=multigate
+ExecStart=/usr/local/bin/multigate --listen 127.0.0.1:8080 --data /var/lib/multigate
+Restart=on-failure
+RestartSec=5s
+
+# Настройки задаются один раз при установке и дальше живут в базе,
+# поэтому файл окружения не обязателен. Если он есть, значения из него
+# применятся только на пустой базе.
+EnvironmentFile=-/etc/multigate/multigate.env
+
+# Ограничения прав: процессу нужен только свой каталог данных и сеть.
+NoNewPrivileges=yes
+PrivateTmp=yes
+PrivateDevices=yes
+ProtectSystem=strict
+ProtectHome=yes
+ProtectKernelTunables=yes
+ProtectKernelModules=yes
+ProtectKernelLogs=yes
+ProtectControlGroups=yes
+ProtectClock=yes
+ProtectHostname=yes
+ProtectProc=invisible
+RestrictSUIDSGID=yes
+RestrictNamespaces=yes
+RestrictRealtime=yes
+RestrictAddressFamilies=AF_INET AF_INET6 AF_UNIX
+LockPersonality=yes
+MemoryDenyWriteExecute=yes
+SystemCallArchitectures=native
+SystemCallFilter=@system-service
+SystemCallFilter=~@privileged @resources
+
+ReadWritePaths=/var/lib/multigate
+
+# Порт больше 1024, повышенные права не нужны вовсе.
+CapabilityBoundingSet=
+AmbientCapabilities=
+
+LimitNOFILE=65535
+
+[Install]
+WantedBy=multi-user.target

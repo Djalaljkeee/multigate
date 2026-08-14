@@ -1,0 +1,57 @@
+{{define "content"}}
+<p><a href="{{.Base}}/headerrules" class="btn btn-ghost btn-sm">← к списку правил</a></p>
+{{if .Error}}<p class="flash flash-err">{{.Error}}</p>{{end}}
+
+<form method="post" action="{{if .Editing}}{{.Base}}/headerrules/{{.ID}}{{else}}{{.Base}}/headerrules/new{{end}}" class="form-stack">
+  {{template "csrf" .CSRF}}
+
+  <label class="field">
+    <span>Название</span>
+    <input type="text" name="name" value="{{.Form.Name}}" required autofocus>
+  </label>
+
+  <label class="field-check">
+    <input type="checkbox" name="enabled" {{if .Form.Enabled}}checked{{end}}>
+    <span>Правило включено</span>
+  </label>
+
+  <label class="field">
+    <span>Приоритет (чем меньше, тем раньше)</span>
+    <input type="number" name="priority" value="{{.Form.Priority}}" required>
+  </label>
+
+  <fieldset class="form-group">
+    <legend>Условия применения (пусто, значит подходит любое значение)</legend>
+    <label class="field">
+      <span>Приложение</span>
+      <input type="text" name="match_app" value="{{.Form.MatchApp}}" placeholder="например, Happ">
+    </label>
+    <label class="field">
+      <span>Платформа</span>
+      <input type="text" name="match_os" value="{{.Form.MatchOS}}" placeholder="например, ios">
+    </label>
+    <label class="field">
+      <span>User-Agent содержит</span>
+      <input type="text" name="match_ua" value="{{.Form.MatchUA}}">
+    </label>
+    <label class="field-check">
+      <input type="checkbox" name="ua_regex" {{if .Form.UARegex}}checked{{end}}>
+      <span>Это регулярное выражение</span>
+    </label>
+  </fieldset>
+
+  <fieldset class="form-group">
+    <legend>Действие</legend>
+    <label class="field">
+      <span>Задать заголовки (по одному на строку, «Имя: значение»)</span>
+      <textarea name="set_headers" rows="4" class="mono">{{.Form.SetLines}}</textarea>
+    </label>
+    <label class="field">
+      <span>Удалить заголовки (по одному имени на строку)</span>
+      <textarea name="del_headers" rows="3" class="mono">{{.Form.DelLines}}</textarea>
+    </label>
+  </fieldset>
+
+  <button type="submit" class="btn btn-primary">{{if .Editing}}Сохранить{{else}}Создать{{end}}</button>
+</form>
+{{end}}

@@ -1,0 +1,50 @@
+name: Проверка
+
+on:
+  push:
+    branches: [main, dev]
+  pull_request:
+    branches: [main, dev]
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    name: Сборка, vet и тесты
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.26'
+          cache: true
+
+      - name: Формат кода
+        run: |
+          # gofmt должен быть чистым: расхождения ломают ревью диффов.
+          unformatted=$(gofmt -l . | grep -v '^vendor/' || true)
+          if [ -n "$unformatted" ]; then
+            echo "Не отформатированы:"; echo "$unformatted"
+            echo "Запустите: gofmt -w ."
+            exit 1
+          fi
+
+      - name: go vet
+        run: go vet ./...
+
+      - name: Тесты с детектором гонок
+        # Гонки здесь реальны: журнал пишется асинхронно, кэши настроек и
+        # блокировок общие для всех запросов, грейс защищается от параллельного
+        # применения. Тесты без -race такие ошибки не ловят.
+        env:
+          CGO_ENABLED: '1'
+        run: go test ./... -race -count=1
+
+      - name: Сборка под linux/amd64 и linux/arm64
+        env:
+          CGO_ENABLED: '0'
+        run: |
+          GOOS=linux GOARCH=amd64 go build -trimpath ./cmd/multigate
+          GOOS=linux GOARCH=arm64 go build -trimpath ./cmd/multigate

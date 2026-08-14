@@ -1,0 +1,66 @@
+{{define "content"}}
+<p class="guest-subtitle">Первичная настройка. Выполняется один раз, дальше всё меняется здесь же, во вкладке «Настройки».</p>
+{{if .Error}}<p class="flash flash-err">{{.Error}}</p>{{end}}
+<form method="post" action="{{.Base}}/setup" class="form-stack" id="setup-form">
+  {{template "csrf" .CSRF}}
+
+  <fieldset class="form-group">
+    <legend>Администратор</legend>
+    <label class="field">
+      <span>Логин</span>
+      <input type="text" name="username" value="{{.Form.Username}}" autocomplete="username" required autofocus>
+    </label>
+    <label class="field">
+      <span>Пароль</span>
+      <input type="password" name="password" autocomplete="new-password" minlength="8" required>
+    </label>
+    <label class="field">
+      <span>Повтор пароля</span>
+      <input type="password" name="password_confirm" autocomplete="new-password" minlength="8" required>
+    </label>
+    <p class="hint">Не короче 8 символов. Хранится только хеш.</p>
+  </fieldset>
+
+  <fieldset class="form-group">
+    <legend>Режим работы</legend>
+    <label class="field-radio">
+      <input type="radio" name="mode" value="mirror" data-mode-switch {{if eq .Form.Mode "mirror"}}checked{{end}}>
+      <span>Зеркало: прослойка проксирует запросы на внешний домен панели</span>
+    </label>
+    <label class="field-radio">
+      <input type="radio" name="mode" value="panel" data-mode-switch {{if eq .Form.Mode "panel"}}checked{{end}}>
+      <span>Панель: прослойка сама ходит в API Remnawave</span>
+    </label>
+  </fieldset>
+
+  <fieldset class="form-group" data-mode-for="mirror">
+    <legend>Зеркало</legend>
+    <label class="field">
+      <span>Домен origin</span>
+      <input type="text" name="mirror_target" value="{{.Form.MirrorTarget}}" placeholder="panel.example.com">
+    </label>
+  </fieldset>
+
+  <fieldset class="form-group" data-mode-for="panel">
+    <legend>Панель Remnawave</legend>
+    <label class="field">
+      <span>Адрес API панели</span>
+      <input type="text" name="panel_url" value="{{.Form.PanelURL}}" placeholder="https://panel.example.com">
+    </label>
+    <label class="field">
+      <span>Токен API</span>
+      <input type="password" name="panel_token" autocomplete="off">
+    </label>
+  </fieldset>
+
+  <fieldset class="form-group">
+    <legend>Домен прослойки</legend>
+    <label class="field">
+      <span>Домен, на котором работает сама прослойка</span>
+      <input type="text" name="domain" value="{{.Form.Domain}}" placeholder="sub.example.com">
+    </label>
+  </fieldset>
+
+  <button type="submit" class="btn btn-primary btn-block">Сохранить и войти</button>
+</form>
+{{end}}

@@ -1,0 +1,44 @@
+# MultiGate рядом с панелью Remnawave.
+#
+# Прослойка слушает только на localhost: наружу её выставляет тот же
+# обратный прокси, который уже обслуживает панель. Открывать порт 8080
+# в интернет напрямую не нужно и не следует.
+services:
+  multigate:
+    image: ghcr.io/qwe8nxtroud/multigate:v1
+    container_name: multigate
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:8080:8080"
+    volumes:
+      - multigate-data:/var/lib/multigate
+    environment:
+      MULTIGATE_LISTEN: "0.0.0.0:8080"
+      MULTIGATE_DATA_DIR: "/var/lib/multigate"
+      MULTIGATE_LOG_LEVEL: "info"
+
+      # Первичная настройка. Значения применяются ОДИН раз, на пустой базе.
+      # Дальше настройки живут в самой базе и правятся в админке,
+      # поэтому перезапуск контейнера не затирает то, что вы поменяли руками.
+      MULTIGATE_MODE: "panel"
+      MULTIGATE_PANEL_URL: "http://remnawave:3000"
+      MULTIGATE_PANEL_TOKEN: "${MULTIGATE_PANEL_TOKEN}"
+      MULTIGATE_DOMAIN: "sub.example.com"
+      MULTIGATE_ADMIN_USER: "admin"
+      MULTIGATE_ADMIN_PASSWORD: "${MULTIGATE_ADMIN_PASSWORD}"
+    networks:
+      - remnawave-network
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+volumes:
+  multigate-data:
+
+# Сеть панели уже существует: подключаемся к ней, а не создаём свою,
+# иначе прослойка не достучится до контейнера панели по имени.
+networks:
+  remnawave-network:
+    external: true

@@ -1,0 +1,51 @@
+{{define "content"}}
+<form method="get" action="{{.Base}}/users" class="filter-form">
+  <label class="field field-sm">
+    <span>Поиск</span>
+    <input type="text" name="q" value="{{.Search}}" placeholder="логин, email, shortUuid...">
+  </label>
+  <div class="filter-actions">
+    <button type="submit" class="btn btn-primary">Найти</button>
+    {{if .Search}}<a href="{{.Base}}/users" class="btn btn-ghost">Сбросить</a>{{end}}
+  </div>
+</form>
+
+{{if .PanelErr}}
+  <p class="flash flash-err">{{.PanelErr}}</p>
+{{else}}
+  <p class="list-total">Всего: {{.Total}}</p>
+  {{if not .Users}}
+    {{template "empty" "Пользователей не найдено"}}
+  {{else}}
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Логин</th>
+          <th>shortUuid</th>
+          <th>Статус</th>
+          <th>Истекает</th>
+          <th>Трафик</th>
+          <th>Устройств макс.</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        {{range .Users}}
+        <tr>
+          <td>{{.Username}}</td>
+          <td class="mono">{{.ShortUUID}}</td>
+          <td><span class="tag">{{.Status}}</span></td>
+          <td class="nowrap">{{fmtTime .ExpireAt}}</td>
+          <td class="nowrap">{{fmtBytes .UsedTrafficBytes}}{{if gt .TrafficLimitBytes 0}} / {{fmtBytes .TrafficLimitBytes}}{{end}}</td>
+          <td>{{.HWIDDeviceLimit}}</td>
+          <td><a href="{{$.Base}}/users/{{.ShortUUID}}" class="btn btn-xs">Открыть</a></td>
+        </tr>
+        {{end}}
+      </tbody>
+    </table>
+  </div>
+  {{template "pagination" .Pager}}
+  {{end}}
+{{end}}
+{{end}}

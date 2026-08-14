@@ -1,0 +1,108 @@
+{{define "content"}}
+<form method="get" action="{{.Base}}/reqlog" class="filter-form">
+  <label class="field field-sm">
+    <span>shortUuid</span>
+    <input type="text" name="short_uuid" value="{{.Filter.ShortUUID}}">
+  </label>
+  <label class="field field-sm">
+    <span>HWID</span>
+    <input type="text" name="hwid" value="{{.Filter.HWID}}">
+  </label>
+  <label class="field field-sm">
+    <span>IP</span>
+    <input type="text" name="ip" value="{{.Filter.IP}}">
+  </label>
+  <label class="field field-sm">
+    <span>Приложение</span>
+    <input type="text" name="app" value="{{.Filter.App}}">
+  </label>
+  <label class="field field-sm">
+    <span>Решение</span>
+    <select name="decision">
+      <option value="">любое</option>
+      {{range $v := decisionOptions}}
+      <option value="{{$v}}"{{if eq $.Filter.Decision $v}} selected{{end}}>{{decisionRU $v}}</option>
+      {{end}}
+    </select>
+  </label>
+  <label class="field field-sm">
+    <span>Поиск по UA</span>
+    <input type="text" name="q" value="{{.Filter.Search}}">
+  </label>
+  <label class="field field-sm">
+    <span>С</span>
+    <input type="datetime-local" name="since" value="{{.SinceStr}}">
+  </label>
+  <label class="field field-sm">
+    <span>По</span>
+    <input type="datetime-local" name="until" value="{{.UntilStr}}">
+  </label>
+  <div class="filter-actions">
+    <button type="submit" class="btn btn-primary">Применить</button>
+    <a href="{{.Base}}/reqlog" class="btn btn-ghost">Сбросить</a>
+  </div>
+</form>
+
+<p class="list-total">Всего найдено: {{.Total}}</p>
+
+{{if not .Rows}}
+  {{template "empty" "Ничего не найдено по этим условиям"}}
+{{else}}
+<div class="table-wrap">
+  <table>
+    <thead>
+      <tr>
+        <th>Время</th>
+        <th>shortUuid</th>
+        <th>Пользователь</th>
+        <th>IP</th>
+        <th>Приложение</th>
+        <th>Платформа</th>
+        <th>HWID</th>
+        <th>Формат</th>
+        <th>Решение</th>
+        <th>Статус</th>
+        <th>Действия</th>
+      </tr>
+    </thead>
+    <tbody>
+      {{range .Rows}}
+      <tr>
+        <td class="nowrap">{{fmtTime .At}}</td>
+        <td class="mono">{{if .ShortUUID}}<a href="{{$.Base}}/users/{{.ShortUUID}}">{{.ShortUUID}}</a>{{end}}</td>
+        <td>{{.Username}}</td>
+        <td class="mono">{{.IP}}</td>
+        <td>{{.App}} {{.AppVersion}}</td>
+        <td>{{.Platform}}</td>
+        <td class="mono" title="{{.UserAgent}}">{{.HWID}}</td>
+        <td>{{.Format}}</td>
+        <td><span class="tag tag-{{.Decision}}">{{decisionRU .Decision}}</span></td>
+        <td class="{{statusClass .Status}}">{{.Status}}</td>
+        <td class="row-actions">
+          {{if .HWID}}
+          <form method="post" action="{{$.Base}}/reqlog/block" data-confirm="Заблокировать устройство {{.HWID}}?">
+            {{template "csrf" $.CSRF}}
+            <input type="hidden" name="kind" value="device">
+            <input type="hidden" name="value" value="{{.HWID}}">
+            <input type="hidden" name="return" value="{{$.ReturnTo}}">
+            <button type="submit" class="btn btn-xs btn-danger">Блок устройства</button>
+          </form>
+          {{end}}
+          {{if .ShortUUID}}
+          <form method="post" action="{{$.Base}}/reqlog/block" data-confirm="Заблокировать пользователя {{.ShortUUID}}?">
+            {{template "csrf" $.CSRF}}
+            <input type="hidden" name="kind" value="user">
+            <input type="hidden" name="value" value="{{.ShortUUID}}">
+            <input type="hidden" name="return" value="{{$.ReturnTo}}">
+            <button type="submit" class="btn btn-xs btn-danger">Блок пользователя</button>
+          </form>
+          {{end}}
+        </td>
+      </tr>
+      {{end}}
+    </tbody>
+  </table>
+</div>
+{{template "pagination" .Pager}}
+{{end}}
+{{end}}

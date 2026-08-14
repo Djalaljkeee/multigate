@@ -1,0 +1,17 @@
+{{define "content"}}
+<p class="guest-subtitle">Вход в админку прослойки</p>
+{{if .Error}}<p class="flash flash-err">{{.Error}}</p>{{end}}
+<form method="post" action="{{.Base}}/login" class="form-stack">
+  {{template "csrf" .CSRF}}
+  <input type="hidden" name="next" value="{{.Next}}">
+  <label class="field">
+    <span>Логин</span>
+    <input type="text" name="username" autocomplete="username" required autofocus>
+  </label>
+  <label class="field">
+    <span>Пароль</span>
+    <input type="password" name="password" autocomplete="current-password" required>
+  </label>
+  <button type="submit" class="btn btn-primary btn-block">Войти</button>
+</form>
+{{end}}
