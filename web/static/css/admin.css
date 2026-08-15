@@ -3,43 +3,74 @@
    в интерфейсе нет: так меньше состояния и меньше JS. */
 
 :root {
-  --bg: #f4f5f7;
+  /* Поверхности: тёплый нейтральный фон, чтобы белые карточки на нём читались
+     как отдельный слой, а не сливались. */
+  --bg: #f5f6f8;
   --surface: #ffffff;
-  --surface-2: #eceef2;
-  --border: #dde0e6;
-  --text: #191c22;
-  --text-dim: #5c6270;
-  --primary: #2f6fed;
-  --primary-hover: #2559c4;
+  --surface-2: #eef0f4;
+  --surface-3: #e6e9ef;
+  --border: #e2e5ea;
+  --border-strong: #cfd4dc;
+  --text: #171a21;
+  --text-dim: #616b7a;
+  --text-faint: #8a93a2;
+
+  /* Акцент: индиго вместо стокового синего, даёт характер и отделяет
+     продукт от типового bootstrap-дашборда. */
+  --primary: #4f46e5;
+  --primary-hover: #4338ca;
+  --primary-soft: #eef0fe;
   --primary-text: #ffffff;
-  --danger: #d64545;
-  --danger-hover: #b93a3a;
-  --ok: #1a8f5e;
-  --warn: #b3720a;
-  --err: #d64545;
-  --radius: 8px;
-  --shadow: 0 1px 3px rgba(20, 22, 30, 0.08), 0 1px 2px rgba(20, 22, 30, 0.06);
-  --sidebar-w: 224px;
-  --topbar-h: 56px;
+
+  --danger: #dc2626;
+  --danger-hover: #b91c1c;
+  --ok: #0f9d6a;
+  --warn: #b45309;
+  --err: #dc2626;
+
+  /* Шкала радиусов и теней: мягкие, многослойные тени вместо одной жёсткой. */
+  --radius-sm: 6px;
+  --radius: 10px;
+  --radius-lg: 14px;
+  --shadow-sm: 0 1px 2px rgba(23, 26, 33, 0.06);
+  --shadow: 0 1px 3px rgba(23, 26, 33, 0.08), 0 4px 12px rgba(23, 26, 33, 0.05);
+  --shadow-lg: 0 8px 30px rgba(23, 26, 33, 0.12);
+
+  --sidebar-w: 236px;
+  --topbar-h: 60px;
+  --content-max: 1160px;
+
+  /* Моноширинный стек для идентификаторов, чисел и кода: цифры не должны
+     плясать по ширине в таблицах и метриках. */
+  --mono: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --bg: #14161b;
-    --surface: #1c1f26;
-    --surface-2: #24272f;
-    --border: #2d313b;
-    --text: #e7e9ee;
-    --text-dim: #9aa1ad;
-    --primary: #5088ff;
-    --primary-hover: #6d9dff;
-    --primary-text: #0c1220;
-    --danger: #ef6161;
-    --danger-hover: #f47a7a;
-    --ok: #3ecf8e;
-    --warn: #e0a530;
-    --err: #ef6161;
-    --shadow: 0 1px 3px rgba(0, 0, 0, 0.4), 0 1px 2px rgba(0, 0, 0, 0.3);
+    --bg: #0f1117;
+    --surface: #171a21;
+    --surface-2: #1e222c;
+    --surface-3: #262b37;
+    --border: #2a303c;
+    --border-strong: #39414f;
+    --text: #e8eaef;
+    --text-dim: #99a2b1;
+    --text-faint: #6b7484;
+
+    --primary: #818cf8;
+    --primary-hover: #a5b0fb;
+    --primary-soft: #1e2140;
+    --primary-text: #0c1020;
+
+    --danger: #f87171;
+    --danger-hover: #fca5a5;
+    --ok: #34d399;
+    --warn: #fbbf24;
+    --err: #f87171;
+
+    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
+    --shadow: 0 1px 3px rgba(0, 0, 0, 0.5), 0 4px 12px rgba(0, 0, 0, 0.35);
+    --shadow-lg: 0 10px 34px rgba(0, 0, 0, 0.5);
   }
 }
 
@@ -52,17 +83,37 @@ html, body {
   color: var(--text);
   font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
   font-size: 15px;
-  line-height: 1.45;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
   /* Системные шрифты: файлов шрифтов в бинарнике нет и не будет. */
 }
 
 body { min-height: 100vh; }
 
-h1 { font-size: 1.4rem; margin: 0 0 1rem; }
-h2 { font-size: 1.05rem; margin: 1.75rem 0 0.75rem; color: var(--text); }
+/* Заголовок страницы крупный и с плотным трекингом: сразу задаёт, где ты. */
+h1 {
+  font-size: 1.55rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  margin: 0 0 1.25rem;
+}
+/* Подзаголовки секций набраны капителью с разрядкой: отделяют блоки,
+   не перетягивая на себя вес основного заголовка. */
+h2 {
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-dim);
+  margin: 2rem 0 0.85rem;
+}
 p { margin: 0 0 0.75rem; }
 a { color: var(--primary); text-decoration: none; }
 a:hover { text-decoration: underline; }
+
+/* Числа и метрики моноширинными табличными цифрами: не пляшут по ширине. */
+.tnum { font-variant-numeric: tabular-nums; }
 
 /* ---------- Каркас с меню ---------- */
 
@@ -79,7 +130,7 @@ a:hover { text-decoration: underline; }
   display: flex;
   align-items: center;
   gap: 0.75rem;
-  padding: 0 1rem;
+  padding: 0 1.25rem;
   background: var(--surface);
   border-bottom: 1px solid var(--border);
   position: sticky;
@@ -87,21 +138,55 @@ a:hover { text-decoration: underline; }
   z-index: 20;
 }
 
+/* Бренд: монограмма в квадрате с акцентным градиентом плюс wordmark.
+   Значок делает шапку узнаваемой, а не просто строкой текста. */
 .brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
   font-weight: 700;
-  letter-spacing: 0.01em;
+  font-size: 1.05rem;
+  letter-spacing: -0.01em;
+  color: var(--text);
+}
+.brand::before {
+  content: "M";
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  background: linear-gradient(135deg, var(--primary), #7c3aed);
+  color: #fff;
+  font-size: 0.95rem;
+  font-weight: 800;
+  line-height: 1;
 }
 
+/* Индикатор режима с цветной точкой: состояние читается мгновенно,
+   не вчитываясь в текст. */
 .mode-badge {
-  font-size: 0.78rem;
-  padding: 0.2rem 0.55rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.76rem;
+  font-weight: 600;
+  padding: 0.24rem 0.65rem;
   border-radius: 999px;
   background: var(--surface-2);
   color: var(--text-dim);
   border: 1px solid var(--border);
 }
-.mode-badge.mode-panel { color: var(--ok); border-color: var(--ok); }
-.mode-badge.mode-mirror { color: var(--primary); border-color: var(--primary); }
+.mode-badge::before {
+  content: "";
+  width: 7px;
+  height: 7px;
+  border-radius: 999px;
+  background: currentColor;
+}
+.mode-badge.mode-panel { color: var(--ok); border-color: color-mix(in srgb, var(--ok) 40%, var(--border)); background: color-mix(in srgb, var(--ok) 10%, var(--surface)); }
+.mode-badge.mode-mirror { color: var(--primary); border-color: color-mix(in srgb, var(--primary) 40%, var(--border)); background: var(--primary-soft); }
 
 .logout-form { margin-left: auto; }
 
@@ -128,7 +213,7 @@ a:hover { text-decoration: underline; }
   grid-area: sidebar;
   background: var(--surface);
   border-right: 1px solid var(--border);
-  padding: 1rem 0.5rem;
+  padding: 1rem 0.65rem;
   display: flex;
   flex-direction: column;
   gap: 2px;
@@ -136,23 +221,45 @@ a:hover { text-decoration: underline; }
 }
 
 .sidebar a {
-  color: var(--text);
-  padding: 0.55rem 0.75rem;
-  border-radius: var(--radius);
+  position: relative;
+  color: var(--text-dim);
+  padding: 0.55rem 0.8rem;
+  border-radius: var(--radius-sm);
   text-decoration: none;
-  font-size: 0.94rem;
+  font-size: 0.92rem;
+  font-weight: 500;
+  transition: background 0.12s, color 0.12s;
 }
-.sidebar a:hover { background: var(--surface-2); }
-.sidebar a.active { background: var(--primary); color: var(--primary-text); font-weight: 600; }
+.sidebar a:hover { background: var(--surface-2); color: var(--text); text-decoration: none; }
+/* Активный пункт: мягкая подложка и левый акцент вместо сплошной заливки.
+   Спокойнее сплошного синего блока и лучше держит ритм списка. */
+.sidebar a.active {
+  background: var(--primary-soft);
+  color: var(--primary);
+  font-weight: 600;
+}
+.sidebar a.active::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 20%;
+  bottom: 20%;
+  width: 3px;
+  border-radius: 0 3px 3px 0;
+  background: var(--primary);
+}
 
 .scrim { display: none; }
 
 .content {
   grid-area: content;
-  padding: 1.25rem 1.5rem 3rem;
+  padding: 1.6rem 1.75rem 3.5rem;
   min-width: 0; /* иначе таблицы внутри распирают колонку грида */
   overflow-x: hidden;
 }
+/* Контент центрируем и ограничиваем по ширине: на широком мониторе поля
+   формы и таблицы не растягиваются на всю панель до нечитаемости. */
+.content > * { max-width: var(--content-max); margin-inline: auto; }
 
 /* ---------- Гостевые страницы: вход и мастер настройки ---------- */
 
@@ -166,19 +273,35 @@ a:hover { text-decoration: underline; }
 
 .guest-card {
   width: 100%;
-  max-width: 420px;
+  max-width: 400px;
   background: var(--surface);
   border: 1px solid var(--border);
-  border-radius: var(--radius);
-  box-shadow: var(--shadow);
-  padding: 1.75rem;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  padding: 2rem 1.85rem;
 }
 
+/* Монограмма и на гостевом экране: вход выглядит частью продукта,
+   а не голой формой. */
 .guest-brand {
   font-weight: 700;
-  font-size: 1.2rem;
-  margin-bottom: 0.25rem;
+  font-size: 1.25rem;
+  letter-spacing: -0.01em;
+  margin-bottom: 0.35rem;
   text-align: center;
+}
+.guest-brand::before {
+  content: "M";
+  display: block;
+  width: 44px;
+  height: 44px;
+  margin: 0 auto 0.7rem;
+  border-radius: 12px;
+  background: linear-gradient(135deg, var(--primary), #7c3aed);
+  color: #fff;
+  font-size: 1.5rem;
+  font-weight: 800;
+  line-height: 44px;
 }
 
 .guest-subtitle {
@@ -194,25 +317,35 @@ a:hover { text-decoration: underline; }
 .form-inline, .filter-form { display: flex; flex-wrap: wrap; gap: 0.75rem; align-items: end; margin-bottom: 1rem; }
 .inline-form { display: inline-flex; gap: 0.4rem; align-items: center; }
 
+/* Группа настроек оформлена карточкой, а не браузерным fieldset с рамкой
+   вокруг легенды: заголовок выносится наверх, поля идут аккуратной колонкой
+   ограниченной ширины, чтобы адрес не растягивался через весь монитор. */
 .form-group {
   border: 1px solid var(--border);
   border-radius: var(--radius);
-  padding: 0.9rem 1rem 1.1rem;
+  padding: 1.1rem 1.2rem 1.25rem;
   margin: 0;
+  max-width: 760px;
+  background: var(--surface);
+  box-shadow: var(--shadow-sm);
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
+  gap: 0.9rem;
 }
 .form-group legend {
-  padding: 0 0.4rem;
-  font-size: 0.85rem;
-  color: var(--text-dim);
-  font-weight: 600;
+  float: left;
+  width: 100%;
+  padding: 0 0 0.15rem;
+  margin-bottom: 0.35rem;
+  font-size: 0.9rem;
+  color: var(--text);
+  font-weight: 700;
+  border-bottom: 1px solid var(--border);
 }
 .form-group[data-mode-for].mode-hidden { display: none; }
 
-.field, .field-sm { display: flex; flex-direction: column; gap: 0.3rem; }
-.field span, .field-sm span { font-size: 0.82rem; color: var(--text-dim); }
+.field, .field-sm { display: flex; flex-direction: column; gap: 0.35rem; }
+.field span, .field-sm span { font-size: 0.82rem; font-weight: 500; color: var(--text-dim); }
 .field-sm { min-width: 150px; }
 
 .field-check, .field-radio {
@@ -226,19 +359,27 @@ input[type="text"], input[type="password"], input[type="number"],
 input[type="datetime-local"], select, textarea {
   background: var(--surface);
   color: var(--text);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 0.5rem 0.6rem;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-sm);
+  padding: 0.5rem 0.65rem;
   font-size: 0.92rem;
   font-family: inherit;
   min-width: 0;
+  transition: border-color 0.12s, box-shadow 0.12s;
 }
+input::placeholder, textarea::placeholder { color: var(--text-faint); }
 .input-sm { width: 100%; max-width: 260px; }
-textarea.mono { resize: vertical; }
+textarea.mono { resize: vertical; font-family: var(--mono); }
 
-input:focus, select:focus, textarea:focus, button:focus, a.btn:focus {
+/* Фокус мягким кольцом акцентного цвета, а не жёстким системным контуром. */
+input:focus, select:focus, textarea:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary) 22%, transparent);
+}
+button:focus-visible, a.btn:focus-visible, .sidebar a:focus-visible {
   outline: 2px solid var(--primary);
-  outline-offset: 1px;
+  outline-offset: 2px;
 }
 
 input[type="checkbox"], input[type="radio"] { width: 16px; height: 16px; accent-color: var(--primary); }
@@ -271,7 +412,13 @@ input[type="checkbox"], input[type="radio"] { width: 16px; height: 16px; accent-
 .btn-xs { padding: 0.25rem 0.5rem; font-size: 0.76rem; }
 .btn-disabled { opacity: 0.45; pointer-events: none; }
 
-.btn-primary { background: var(--primary); border-color: var(--primary); color: var(--primary-text); font-weight: 600; }
+.btn-primary {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: var(--primary-text);
+  font-weight: 600;
+  box-shadow: 0 1px 2px color-mix(in srgb, var(--primary) 40%, transparent);
+}
 .btn-primary:hover { background: var(--primary-hover); border-color: var(--primary-hover); }
 
 .btn-danger { background: transparent; border-color: var(--danger); color: var(--danger); }
@@ -285,21 +432,52 @@ input[type="checkbox"], input[type="radio"] { width: 16px; height: 16px; accent-
 .cards {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
-  gap: 0.75rem;
-  margin-bottom: 1rem;
+  gap: 0.85rem;
+  margin-bottom: 1.5rem;
 }
 .card {
+  position: relative;
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: var(--radius);
-  padding: 0.85rem 1rem;
+  padding: 1rem 1.1rem 1.05rem;
+  box-shadow: var(--shadow-sm);
+  overflow: hidden;
 }
-.card-label { font-size: 0.78rem; color: var(--text-dim); margin-bottom: 0.25rem; }
-.card-value { font-size: 1.3rem; font-weight: 700; margin: 0; }
-.card-sub { font-size: 0.78rem; color: var(--text-dim); margin: 0.2rem 0 0; }
+/* Тонкая акцентная полоса сверху карточки: оживляет ряд метрик,
+   не добавляя шума. */
+.card::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 3px;
+  background: var(--primary);
+  opacity: 0.7;
+}
+.card-label {
+  font-size: 0.72rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-faint);
+  margin-bottom: 0.5rem;
+}
+.card-value {
+  font-size: 1.65rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.1;
+  margin: 0;
+}
+.card-sub { font-size: 0.78rem; color: var(--text-dim); margin: 0.35rem 0 0; }
+/* Смысловые цвета красят и значение, и акцентную полосу карточки разом. */
 .card-ok { color: var(--ok); }
 .card-warn { color: var(--warn); }
 .card-err { color: var(--err); }
+.card:has(.card-ok)::before { background: var(--ok); }
+.card:has(.card-warn)::before { background: var(--warn); }
+.card:has(.card-err)::before { background: var(--err); }
 
 /* ---------- Таблицы ---------- */
 
@@ -308,50 +486,90 @@ input[type="checkbox"], input[type="radio"] { width: 16px; height: 16px; accent-
   border: 1px solid var(--border);
   border-radius: var(--radius);
   background: var(--surface);
+  box-shadow: var(--shadow-sm);
 }
 
 table { border-collapse: collapse; width: 100%; min-width: 620px; }
 th, td {
   text-align: left;
-  padding: 0.55rem 0.7rem;
+  padding: 0.6rem 0.8rem;
   border-bottom: 1px solid var(--border);
   font-size: 0.86rem;
   white-space: nowrap;
+  vertical-align: middle;
 }
-td.mono, th.mono { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+td.mono, th.mono { font-family: var(--mono); }
 td:not(.nowrap):not(.mono) { white-space: normal; }
+/* Заголовки таблиц капителью с разрядкой: сразу отличимы от данных,
+   даже когда шапка прилипла при прокрутке. */
 thead th {
-  color: var(--text-dim);
+  color: var(--text-faint);
   font-weight: 600;
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
   background: var(--surface-2);
+  border-bottom: 1px solid var(--border-strong);
   position: sticky;
   top: 0;
 }
+tbody tr { transition: background 0.1s; }
 tbody tr:last-child td { border-bottom: none; }
 tbody tr:hover { background: var(--surface-2); }
+/* Числовые ячейки табличными цифрами: столбцы статуса и счётчиков ровные. */
+td.mono, td.tnum, .st-ok, .st-warn, .st-err { font-variant-numeric: tabular-nums; }
 .nowrap { white-space: nowrap; }
-.mono { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 0.82rem; }
+.mono { font-family: var(--mono); font-size: 0.82rem; }
 
-.row-actions { display: flex; gap: 0.4rem; flex-wrap: wrap; white-space: normal; }
+/* Действия в строке журнала: компактный ряд нейтральных кнопок.
+   Красный проявляется только на наведении, чтобы таблица не выглядела
+   стеной тревожных кнопок в каждой строке. */
+.row-actions { display: flex; gap: 0.35rem; flex-wrap: wrap; white-space: normal; }
 .row-actions form { display: inline-flex; }
+.row-actions .btn-danger {
+  border-color: var(--border);
+  color: var(--text-dim);
+  background: var(--surface);
+}
+.row-actions .btn-danger:hover {
+  border-color: var(--danger);
+  color: #fff;
+  background: var(--danger);
+}
 
-.list-total { color: var(--text-dim); font-size: 0.85rem; }
+.list-total { color: var(--text-dim); font-size: 0.85rem; margin-bottom: 0.65rem; }
 
 /* ---------- Прочие мелочи ---------- */
 
+/* Пилюля статуса с цветной точкой: решение по строке журнала считывается
+   по цвету, а мягкая подложка вместо голой рамки убирает пестроту. */
 .tag {
-  display: inline-block;
-  padding: 0.1rem 0.5rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.14rem 0.55rem;
   border-radius: 999px;
   background: var(--surface-2);
   border: 1px solid var(--border);
-  font-size: 0.76rem;
+  font-size: 0.75rem;
+  font-weight: 600;
   color: var(--text-dim);
+  white-space: nowrap;
 }
-.tag-blocked, .tag-blocked { color: var(--err); border-color: var(--err); }
-.tag-normal { color: var(--ok); border-color: var(--ok); }
-.tag-decoy { color: var(--warn); border-color: var(--warn); }
-.tag-error { color: var(--err); border-color: var(--err); }
+.tag::before {
+  content: "";
+  width: 6px;
+  height: 6px;
+  border-radius: 999px;
+  background: currentColor;
+  flex: none;
+}
+.tag-normal { color: var(--ok); border-color: color-mix(in srgb, var(--ok) 35%, var(--border)); background: color-mix(in srgb, var(--ok) 10%, var(--surface)); }
+.tag-blocked { color: var(--err); border-color: color-mix(in srgb, var(--err) 35%, var(--border)); background: color-mix(in srgb, var(--err) 10%, var(--surface)); }
+.tag-expired { color: var(--warn); border-color: color-mix(in srgb, var(--warn) 35%, var(--border)); background: color-mix(in srgb, var(--warn) 10%, var(--surface)); }
+.tag-decoy { color: var(--text-dim); }
+.tag-error { color: var(--err); border-color: color-mix(in srgb, var(--err) 35%, var(--border)); background: color-mix(in srgb, var(--err) 10%, var(--surface)); }
+.tag-notfound { color: var(--text-faint); }
 
 .st-ok { color: var(--ok); }
 .st-warn { color: var(--warn); }
