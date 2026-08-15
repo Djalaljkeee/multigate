@@ -123,6 +123,16 @@ make dist    # архивы под linux/amd64 и linux/arm64
 make docker  # образ
 ```
 
+## Автор
+
+MultiGate сделан в [VPN HUB](https://vpn-hub.pro): база знаний и сообщество для тех,
+кто запускает и держит коммерческий VPN-сервис.
+
+Ещё продукты VPN HUB для той же задачи:
+
+- **[MultiScript](https://vpn-hub.pro/a/multiscript-about)** — VPN-сервис под ключ: панель Remnawave, ноды и бот продаж разворачиваются из одного меню.
+- **[MultiRoller](https://vpn-hub.pro/a/33-multiroller)** — чистые IP, которых нет у конкурентов.
+
 ## Лицензия
 
 [MIT](LICENSE).

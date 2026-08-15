@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/qwe8nxtroud/multigate/internal/brand"
 	"github.com/qwe8nxtroud/multigate/internal/store"
 	"github.com/qwe8nxtroud/multigate/web"
 )
@@ -89,6 +90,10 @@ func funcMap() template.FuncMap {
 			}
 		},
 		"dict": tplDict,
+		// brand отдаёт шаблону атрибуцию автора и список продуктов из одного
+		// источника (пакет brand), чтобы футер и страница «О системе» не
+		// держали свои копии текста и ссылок.
+		"brand": brand.Get,
 	}
 }
 

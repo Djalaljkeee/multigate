@@ -3,6 +3,10 @@
   <dt>Версия</dt><dd>{{.Full}}</dd>
   <dt>Аптайм</dt><dd>{{.Uptime}}</dd>
   <dt>База данных</dt><dd>{{.Dialect}}, {{fmtBytes .DBBytes}}</dd>
+  {{with brand}}
+  <dt>Автор</dt><dd><a href="{{.SiteURL}}" target="_blank" rel="noopener">{{.Author}}</a>, {{.SiteURL}}</dd>
+  <dt>Исходники</dt><dd><a href="{{.RepoURL}}" target="_blank" rel="noopener">{{.RepoURL}}</a></dd>
+  {{end}}
 </dl>
 
 <h2>Таблицы базы</h2>

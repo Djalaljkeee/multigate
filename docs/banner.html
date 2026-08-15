@@ -1,0 +1,89 @@
+<!doctype html>
+<meta charset="utf-8">
+<style>
+  /* Баннер 1200x630 под предпросмотр ссылки в Telegram.
+     Шрифты только системные: рендер идёт на сервере без интернета. */
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    width: 1200px; height: 630px; overflow: hidden;
+    font-family: -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    background: #0d1117;
+    color: #e6edf3;
+    position: relative;
+  }
+  /* Мягкое свечение в углу, чтобы плоский тёмный фон не выглядел мёртвым */
+  .glow {
+    position: absolute; width: 900px; height: 900px; right: -280px; top: -420px;
+    background: radial-gradient(circle, rgba(252,184,116,.18) 0%, rgba(252,184,116,0) 62%);
+  }
+  .grid {
+    position: absolute; inset: 0;
+    background-image:
+      linear-gradient(rgba(255,255,255,.028) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,.028) 1px, transparent 1px);
+    background-size: 46px 46px;
+  }
+  .wrap { position: relative; padding: 62px 68px; height: 100%; display: flex; flex-direction: column; }
+
+  .top { display: flex; align-items: center; gap: 14px; }
+  .badge {
+    font-size: 15px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase;
+    color: #fcb874; border: 1px solid rgba(252,184,116,.42); border-radius: 999px; padding: 7px 16px;
+  }
+  .src { font-size: 15px; color: #7d8590; letter-spacing: .02em; }
+
+  h1 { font-size: 92px; line-height: 1; font-weight: 800; letter-spacing: -.03em; margin-top: 30px; }
+  h1 span { color: #fcb874; }
+  .sub { font-size: 30px; line-height: 1.32; color: #adbac7; margin-top: 20px; max-width: 780px; font-weight: 400; }
+
+  /* Схема потока: клиент, прослойка, панель */
+  .flow { display: flex; align-items: center; gap: 16px; margin-top: 46px; }
+  .node {
+    border: 1px solid #30363d; background: #161b22; border-radius: 12px;
+    padding: 14px 20px; font-size: 19px; color: #adbac7; white-space: nowrap;
+  }
+  .node.mid { border-color: rgba(252,184,116,.55); background: rgba(252,184,116,.09); color: #fcb874; font-weight: 700; }
+  .arrow { color: #4b5563; font-size: 22px; }
+
+  .feats { display: flex; gap: 12px; margin-top: auto; flex-wrap: wrap; }
+  .feat {
+    font-size: 19px; color: #adbac7; background: #161b22;
+    border: 1px solid #30363d; border-radius: 10px; padding: 12px 18px;
+  }
+  .foot { margin-top: 26px; display: flex; align-items: baseline; gap: 16px; }
+  .site { font-size: 23px; color: #fcb874; font-weight: 700; }
+  .lic { font-size: 18px; color: #6e7681; }
+</style>
+
+<div class="glow"></div>
+<div class="grid"></div>
+
+<div class="wrap">
+  <div class="top">
+    <div class="badge">Новая статья · PRO</div>
+    <div class="src">база знаний VPN HUB</div>
+  </div>
+
+  <h1>Multi<span>Gate</span></h1>
+  <div class="sub">Прослойка подписок для Remnawave:<br>российский домен и видно, кто с чего подключается</div>
+
+  <div class="flow">
+    <div class="node">клиент подписки</div>
+    <div class="arrow">&rarr;</div>
+    <div class="node mid">MultiGate</div>
+    <div class="arrow">&rarr;</div>
+    <div class="node">панель Remnawave</div>
+  </div>
+
+  <div class="feats">
+    <div class="feat">журнал с разбором приложений</div>
+    <div class="feat">лимит устройств</div>
+    <div class="feat">грейс вместо отключения</div>
+    <div class="feat">маскировка</div>
+  </div>
+
+  <div class="foot">
+    <div class="site">vpn-hub.pro/a/multigate</div>
+    <div class="lic">исходники открыты, лицензия MIT</div>
+  </div>
+</div>

@@ -21,6 +21,7 @@ import (
 	"golang.org/x/crypto/bcrypt"
 
 	"github.com/qwe8nxtroud/multigate/internal/admin"
+	"github.com/qwe8nxtroud/multigate/internal/brand"
 	"github.com/qwe8nxtroud/multigate/internal/chat"
 	"github.com/qwe8nxtroud/multigate/internal/config"
 	"github.com/qwe8nxtroud/multigate/internal/grace"
@@ -47,10 +48,15 @@ func run() error {
 	}
 	if cfg.ShowVersion {
 		fmt.Println(version.Full())
+		fmt.Println(brand.Line())
 		return nil
 	}
 
 	log := newLogger(cfg)
+	// Заставка автора первой строкой в журнале: её видит администратор при
+	// каждом запуске сервиса, вырезать её из работающей установки нельзя,
+	// не пересобрав бинарник самому.
+	fmt.Fprint(os.Stderr, brand.Banner(version.Version))
 	log.Info("запуск", "версия", version.Version, "коммит", version.Commit, "адрес", cfg.Listen)
 
 	// Сигналы ловим до открытия базы: если пользователь передумал на первой же

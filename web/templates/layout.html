@@ -35,6 +35,23 @@
     <h1>{{.Title}}</h1>
     {{if .Flash}}<p class="flash flash-{{.Flash.Kind}}" role="status">{{.Flash.Text}}</p>{{end}}
     {{template "content" .}}
+    {{with brand}}
+    <footer class="promo">
+      <div class="promo-author">
+        MultiGate от <a href="{{.SiteURL}}" target="_blank" rel="noopener">{{.Author}}</a>
+        · <a href="{{.SiteURL}}" target="_blank" rel="noopener">сайт и база знаний</a>
+        · <a href="{{.RepoURL}}" target="_blank" rel="noopener">исходники</a>
+      </div>
+      <div class="promo-products">
+        <span class="promo-label">Ещё от {{.Author}}:</span>
+        {{range .Products}}
+        <a class="promo-card" href="{{.URL}}" target="_blank" rel="noopener">
+          <b>{{.Name}}</b><span>{{.Tagline}}</span>
+        </a>
+        {{end}}
+      </div>
+    </footer>
+    {{end}}
   </main>
 </div>
 {{else}}
