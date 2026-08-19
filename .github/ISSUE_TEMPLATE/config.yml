@@ -1,0 +1,11 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Сообщество VPN HUB в Telegram
+    url: https://t.me/vpnhub_community
+    about: Вопросы по установке и настройке, обсуждение и помощь по горячим следам.
+  - name: База знаний VPN HUB
+    url: https://vpn-hub.pro
+    about: Статьи по запуску и обслуживанию коммерческого VPN-сервиса, разбор MultiGate.
+  - name: Уязвимость в безопасности
+    url: https://github.com/qwe8nxtroud/multigate/security/advisories/new
+    about: Не заводите публичную задачу. Сообщите приватно, см. SECURITY.md.

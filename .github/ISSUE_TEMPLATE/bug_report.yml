@@ -1,0 +1,73 @@
+name: Ошибка
+description: Что-то работает не так, как описано
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Перед отправкой проверьте журнал: `journalctl -u multigate -n 200` или `docker compose logs --tail=200`.
+        Токены панели, пароли и ссылки подписок из вывода уберите.
+  - type: textarea
+    id: what
+    attributes:
+      label: Что происходит
+      description: Что ожидали и что получили вместо этого.
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Как повторить
+      value: |
+        1.
+        2.
+        3.
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Версия MultiGate
+      description: Вывод `multigate --version` или тег образа.
+      placeholder: "v0.1.0 / ghcr.io ... :latest"
+    validations:
+      required: true
+  - type: input
+    id: panel
+    attributes:
+      label: Версия панели Remnawave
+      placeholder: "2.8.1"
+    validations:
+      required: true
+  - type: dropdown
+    id: install
+    attributes:
+      label: Способ установки
+      options:
+        - Docker (docker-compose.yml)
+        - install.sh + systemd
+        - Сборка из исходников
+    validations:
+      required: true
+  - type: dropdown
+    id: mode
+    attributes:
+      label: Режим работы
+      options:
+        - mirror (зеркало подписки)
+        - panel (выдача через API панели)
+        - не знаю
+    validations:
+      required: true
+  - type: input
+    id: client
+    attributes:
+      label: Клиент и его версия
+      description: Если ошибка воспроизводится в конкретном приложении.
+      placeholder: "Happ 2.6.1 / v2rayNG 1.9.x / Clash Meta"
+  - type: textarea
+    id: logs
+    attributes:
+      label: Журнал
+      description: Строки вокруг ошибки. Секреты вырежьте.
+      render: text

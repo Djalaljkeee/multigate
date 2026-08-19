@@ -1,0 +1,21 @@
+name: Предложение
+description: Чего не хватает в прослойке
+labels: ["enhancement"]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Какую задачу это решает
+      description: Опишите ситуацию из практики, а не готовое решение.
+    validations:
+      required: true
+  - type: textarea
+    id: idea
+    attributes:
+      label: Как это могло бы работать
+    validations:
+      required: true
+  - type: textarea
+    id: workaround
+    attributes:
+      label: Чем обходитесь сейчас

@@ -1,3 +1,22 @@
+<div align="center">
+
+<img src="docs/banner-github.png" alt="MultiGate — прослойка подписок для панели Remnawave" width="100%">
+
+<p>
+  <a href="https://github.com/qwe8nxtroud/multigate/actions/workflows/ci.yml"><img src="https://github.com/qwe8nxtroud/multigate/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
+  <a href="https://github.com/qwe8nxtroud/multigate/releases"><img src="https://img.shields.io/github/v/release/qwe8nxtroud/multigate?label=релиз&color=fcb874" alt="Релиз"></a>
+  <img src="https://img.shields.io/badge/Go-1.26-00ADD8?logo=go&logoColor=white" alt="Go 1.26">
+  <a href="LICENSE"><img src="https://img.shields.io/badge/лицензия-MIT-0d1117" alt="MIT"></a>
+  <img src="https://img.shields.io/badge/Remnawave-2.7.4%2B%20%C2%B7%203.x-6e5cf5" alt="Remnawave 2.7.4+">
+</p>
+
+<p>
+  <a href="https://vpn-hub.pro"><img src="https://img.shields.io/badge/VPN_HUB-vpn--hub.pro-fcb874?style=for-the-badge" alt="vpn-hub.pro"></a>
+  <a href="https://t.me/vpnhub_community"><img src="https://img.shields.io/badge/сообщество-@vpnhub__community-26A5E4?style=for-the-badge&logo=telegram&logoColor=white" alt="Сообщество в Telegram"></a>
+</p>
+
+</div>
+
 # MultiGate
 
 Прослойка подписок для панели [Remnawave](https://remna.st): встаёт между клиентом и панелью,
@@ -6,8 +25,13 @@
 
 Один статический бинарник без зависимостей. SQLite из коробки, MySQL для крупных установок.
 
+> [!WARNING]
 > **Статус: ранняя версия.** Ставьте на тестовом контуре, прежде чем выпускать на клиентов.
 > Функция грейса меняет данные в живой панели и по умолчанию выключена: включайте осознанно.
+
+**Содержание:** [Что решает](#что-решает) · [Возможности](#возможности) · [Как выглядит](#как-выглядит) ·
+[Установка](#установка) · [Настройка](#настройка) · [Токен панели](#токен-панели) ·
+[Совместимость](#совместимость) · [Помощь](#помощь-и-сообщество) · [Разработка](#разработка)
 
 ## Что решает
 
@@ -36,21 +60,56 @@ MultiGate закрывает это, оставаясь снаружи пане�
 - **Админка** со всем перечисленным, встроенная в бинарник.
 
 Подробности устройства: [docs/architecture.md](docs/architecture.md).
+Разбор с примерами из практики: [статья на VPN HUB](https://vpn-hub.pro/a/multigate) — доступ PRO.
+
+## Как выглядит
+
+<div align="center">
+  <img src="docs/screens/mg-overview.png" alt="Сводка: запросы, приложения, устройства" width="80%">
+</div>
+
+<details>
+<summary><b>Ещё экраны админки</b> — журнал, пользователи, правила, настройки</summary>
+
+<br>
+
+**Журнал запросов.** Кто пришёл, с какого приложения и устройства, что получил в ответ.
+
+<img src="docs/screens/mg-reqlog.png" alt="Журнал запросов" width="100%">
+
+**Пользователи.** Устройства, приложения, блокировки — без захода в панель.
+
+<img src="docs/screens/mg-users.png" alt="Список пользователей" width="100%">
+
+**Правила ответа.** Заголовки и параметры подписки под конкретное приложение.
+
+<img src="docs/screens/mg-headerrules.png" alt="Правила заголовков" width="100%">
+
+**Переопределения.** Точечные исключения для отдельных пользователей.
+
+<img src="docs/screens/mg-overrides.png" alt="Переопределения" width="100%">
+
+**Настройки.** Режим, панель, домен, грейс, вебхуки, чат.
+
+<img src="docs/screens/mg-settings.png" alt="Настройки" width="100%">
+
+</details>
 
 ## Установка
 
-### Рядом с панелью, Docker
+### Из исходников
+
+Самый прямой путь, пока проект в ранней стадии: собирается одной командой, ничего лишнего
+в систему не ставит.
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/qwe8nxtroud/multigate/main/deploy/docker-compose.yml -o docker-compose.yml
-# задайте MULTIGATE_PANEL_TOKEN и MULTIGATE_ADMIN_PASSWORD
-docker compose up -d
+git clone https://github.com/qwe8nxtroud/multigate.git
+cd multigate
+make build
+./multigate --listen 127.0.0.1:8080 --data ./data
 ```
 
-Прослойка слушает `127.0.0.1:8080`. Наружу её выставляет тот же обратный прокси,
-который уже обслуживает панель.
-
-### Отдельный сервер
+### Отдельный сервер, systemd
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/qwe8nxtroud/multigate/main/deploy/install.sh -o install.sh
@@ -61,17 +120,30 @@ sudo bash install.sh
 Он **не трогает ваш веб-сервер**: не сносит nginx, не выпускает сертификаты, не правит
 чужие конфигурации. В конце печатает готовые куски конфигурации для nginx и Caddy.
 
-Обновление: `sudo bash install.sh --update`. Если новая версия не поднялась, установщик
-сам откатывается на предыдущую.
+Обновление — **только** `sudo bash install.sh --update`: эта ветка делает резервную копию
+бинарника и откатывается сама, если новая версия не поднялась. Повторный запуск без флага
+перезаписывает бинарник без страховки.
 
-### Из исходников
+### Рядом с панелью, Docker
 
 ```bash
-git clone https://github.com/qwe8nxtroud/multigate.git
-cd multigate
-make build
-./multigate --listen 127.0.0.1:8080 --data ./data
+curl -fsSL https://raw.githubusercontent.com/qwe8nxtroud/multigate/main/deploy/docker-compose.yml -o docker-compose.yml
+# задайте MULTIGATE_PANEL_TOKEN и MULTIGATE_ADMIN_PASSWORD
+docker compose up -d
 ```
+
+> [!NOTE]
+> Образ `ghcr.io/qwe8nxtroud/multigate:v1` появляется в GHCR после первого релиза
+> (`git tag v1.0.0 && git push origin v1.0.0`), и пакет нужно один раз переключить
+> в публичные: **Packages → multigate → Package settings → Change visibility → Public**.
+> Пока этого не сделано, `docker compose up -d` отвечает `error from registry: denied`.
+> Обходной путь без реестра — собрать образ на самом сервере:
+> ```bash
+> make docker VERSION=v1 && docker compose up -d
+> ```
+
+Прослойка слушает `127.0.0.1:8080`. Наружу её выставляет тот же обратный прокси,
+который уже обслуживает панель.
 
 ## Настройка
 
@@ -102,7 +174,7 @@ make build
 
 Токен хранится в базе прослойки. Это значит, что доступ к серверу прослойки равносилен
 доступу к токену панели: держите базу на своём сервере, ограничьте права токена и не
-выставляйте админку в интернет без нужды.
+выставляйте админку в интернет без нужды. Подробнее — [SECURITY.md](SECURITY.md).
 
 ## Совместимость
 
@@ -113,6 +185,34 @@ make build
 | Форматы подписки | base64, обычный список, Clash (YAML), sing-box (JSON) |
 | Архитектуры | linux/amd64, linux/arm64 |
 | База | SQLite (по умолчанию), MySQL или MariaDB |
+
+## Помощь и сообщество
+
+<table>
+<tr>
+<td width="50%">
+
+### 💬 [@vpnhub_community](https://t.me/vpnhub_community)
+
+Сообщество VPN HUB в Telegram: вопросы по установке и настройке,
+разбор проблем по горячим следам, анонсы обновлений.
+Открыто для всех.
+
+</td>
+<td width="50%">
+
+### 📚 [vpn-hub.pro](https://vpn-hub.pro)
+
+База знаний по запуску и обслуживанию коммерческого VPN-сервиса:
+панель, узлы, маскировка, приём платежей, работа с блокировками.
+
+</td>
+</tr>
+</table>
+
+Нашли ошибку — [заведите задачу](https://github.com/qwe8nxtroud/multigate/issues/new/choose).
+Нашли уязвимость — не в публичную задачу, а по [SECURITY.md](SECURITY.md).
+Хотите поучаствовать — [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## Разработка
 
@@ -140,3 +240,8 @@ MultiGate сделан в [VPN HUB](https://vpn-hub.pro): база знаний 
 Проект написан с нуля и не содержит кода других решений. Совпадения в наборе возможностей
 объясняются тем, что задачи у прослоек подписки одинаковые: протокол Remnawave и поведение
 клиентских приложений заданы снаружи.
+
+<div align="center">
+<br>
+<a href="https://vpn-hub.pro"><b>vpn-hub.pro</b></a> · <a href="https://t.me/vpnhub_community">@vpnhub_community</a>
+</div>

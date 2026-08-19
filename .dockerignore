@@ -1,0 +1,14 @@
+.git/
+.github/
+docs/
+dist/
+data/
+*.db
+*.db-wal
+*.db-shm
+*.sqlite
+*.log
+.env
+.DS_Store
+coverage.out
+multigate
