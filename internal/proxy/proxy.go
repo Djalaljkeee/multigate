@@ -48,6 +48,17 @@ type Grace interface {
 	Maybe(ctx context.Context, u model.PanelUser) (applied bool, err error)
 }
 
+// LegacyResolver - см. Deps.Legacy. Реализуется legacy.Resolver.
+type LegacyResolver interface {
+	Resolve(ctx context.Context, token string) (shortUUID string, ok bool)
+}
+
+// SubPage - см. Deps.SubPage. Реализуется subpage.Page. Ошибка значит,
+// что в ответ ничего не записано.
+type SubPage interface {
+	Serve(w http.ResponseWriter, r *http.Request, shortUUID string, platform model.Platform) (status, bytes int, err error)
+}
+
 // Deps - зависимости обработчика подписки.
 type Deps struct {
 	Store *store.DB
@@ -66,6 +77,13 @@ type Deps struct {
 	// Grace - см. тип Grace выше. Может быть nil - тогда грейс не
 	// пытается применяться, как будто store.KeyGraceEnabled всегда выключен.
 	Grace Grace
+	// Legacy переводит старую ссылку Marzban в текущий shortUuid
+	// пользователя (пакет internal/legacy). Может быть nil.
+	Legacy LegacyResolver
+	// SubPage - страница подписки для браузера, пришедшего по живой ссылке
+	// (пакет internal/subpage). Может быть nil - тогда браузер получает
+	// маскировку, как раньше.
+	SubPage SubPage
 	// WGPool - пул готовых конфигов WireGuard/AmneziaWG (пакет
 	// internal/wgpool). Может быть nil - тогда довесок WireGuard в
 	// подписку не добавляется, даже если store.KeyWGPoolEnabled включён.
@@ -161,6 +179,28 @@ func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		}
 	}()
 
+	mode = model.Mode(h.deps.Store.Get(ctx, store.KeyMode))
+
+	// Старая ссылка Marzban: подпись проверена секретом, пользователь найден
+	// в панели. Дальше запрос обслуживается ровно как по его текущей ссылке.
+	if mode == model.ModePanel && shortUUID != "" && h.deps.Legacy != nil {
+		if su, ok := h.deps.Legacy.Resolve(ctx, shortUUID); ok {
+			shortUUID = su
+			rec.ShortUUID = su
+		}
+	}
+
+	// Браузер по живой ссылке получает страницу подписки с инструкциями.
+	// Если подписки нет или панель страницу не разрешила, всё как раньше:
+	// маскировка ниже.
+	if client.IsBrowser && mode == model.ModePanel && shortUUID != "" && h.deps.SubPage != nil &&
+		h.deps.Store.GetBool(ctx, store.KeySubpageEnabled) {
+		if st, n, err := h.deps.SubPage.Serve(w, r, shortUUID, client.Platform); err == nil {
+			decision, status, bytesN = model.DecisionPage, st, n
+			return
+		}
+	}
+
 	// Браузер при включённой маскировке не должен увидеть ничего похожего
 	// на прослойку подписки.
 	if client.IsBrowser && h.deps.Store.GetBool(ctx, store.KeyDecoyEnabled) {
@@ -183,7 +223,6 @@ func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	mode = model.Mode(h.deps.Store.Get(ctx, store.KeyMode))
 	// Формат заглушки нужен и на самых ранних (override) и на поздних
 	// (после fetch) стадиях - оценка по суффиксу пути и ядру клиента,
 	// без знания настоящего формата апстрима.

@@ -26,8 +26,10 @@ import (
 	"github.com/qwe8nxtroud/multigate/internal/config"
 	"github.com/qwe8nxtroud/multigate/internal/grace"
 	"github.com/qwe8nxtroud/multigate/internal/landing"
+	"github.com/qwe8nxtroud/multigate/internal/legacy"
 	"github.com/qwe8nxtroud/multigate/internal/proxy"
 	"github.com/qwe8nxtroud/multigate/internal/store"
+	"github.com/qwe8nxtroud/multigate/internal/subpage"
 	"github.com/qwe8nxtroud/multigate/internal/ua"
 	"github.com/qwe8nxtroud/multigate/internal/version"
 	"github.com/qwe8nxtroud/multigate/internal/webhooks"
@@ -119,8 +121,13 @@ func run() error {
 		// Грейс и пул WireGuard включаются настройками и по умолчанию
 		// выключены, но связать их надо здесь: иначе код есть, а
 		// возможности в работающем сервисе нет.
-		Grace:      graceSvc,
-		WGPool:     wgpool.New(db, log),
+		Grace:  graceSvc,
+		WGPool: wgpool.New(db, log),
+		// Старые ссылки Marzban и страница подписки для браузера тоже
+		// включаются настройками: без секретов Marzban резолвер ничего не
+		// делает, а страница выключена, пока её не включат в админке.
+		Legacy:     legacy.NewResolver(db, panel, log),
+		SubPage:    subpage.New(db, panel, log),
 		Logger:     log,
 		TrustProxy: cfg.TrustProxy,
 	})

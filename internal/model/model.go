@@ -35,6 +35,7 @@ const (
 	DecisionExpired  Decision = "expired"  // срок подписки истёк
 	DecisionNotFound Decision = "notfound" // такого shortUuid нет
 	DecisionDecoy    Decision = "decoy"    // не похоже на клиент подписки, отдать маскировку
+	DecisionPage     Decision = "page"     // браузер пришёл по живой ссылке, отдать страницу подписки
 	// DecisionError: сбой связи с апстримом (панель/зеркало недоступны).
 	// Отдельно от DecisionNormal: иначе в журнале сбой апстрима неотличим
 	// от настоящей успешной выдачи подписки.
@@ -169,6 +170,28 @@ type SubResponse struct {
 	Headers map[string]string
 	Body    []byte
 	Format  Format
+}
+
+// SubInfo: сведения о подписке для страницы, которую видит браузер.
+// Это ответ публичного маршрута панели /api/sub/{shortUuid}/info:
+// тот же источник, из которого страница подписки Remnawave рисует карточку.
+type SubInfo struct {
+	ShortUUID         string
+	Username          string
+	Status            string // ACTIVE | DISABLED | LIMITED | EXPIRED
+	IsActive          bool
+	ExpiresAt         time.Time
+	DaysLeft          int
+	TrafficUsedBytes  int64
+	TrafficLimitBytes int64 // 0: без лимита
+	SubscriptionURL   string
+}
+
+// SubpageRef: какой конфиг страницы подписки панель назначила пользователю
+// и разрешена ли ему страница вообще (правила SRR в панели).
+type SubpageRef struct {
+	ConfigUUID     string
+	WebpageAllowed bool
 }
 
 // Override: локальное правило по конкретному пользователю или устройству.

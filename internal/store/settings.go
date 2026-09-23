@@ -49,6 +49,17 @@ const (
 	KeyWebhookSecret       = "webhook_secret"    // секрет входящих вебхуков от панели
 	KeyWGPoolEnabled       = "wg_pool_enabled"   // выдавать конфиги WireGuard из пула
 	KeyInstalled           = "installed"         // мастер первичной настройки пройден
+
+	// KeyMarzbanLegacyKeys: секреты Marzban через запятую. С ними прослойка
+	// понимает старые ссылки подписки Marzban (см. internal/legacy). Секрет:
+	// в админке показывается только факт «задан».
+	KeyMarzbanLegacyKeys = "marzban_legacy_keys"
+	// KeySubpageEnabled: показывать браузеру по живой ссылке страницу
+	// подписки с инструкциями (internal/subpage) вместо маскировки.
+	KeySubpageEnabled = "subpage_enabled"
+	// KeySubpageLogoURL: логотип на странице подписки; пусто, значит
+	// logoUrl из конфига страницы в панели.
+	KeySubpageLogoURL = "subpage_logo_url"
 )
 
 // defaults: значения, с которыми прослойка стартует на пустой базе.
@@ -71,6 +82,7 @@ var defaults = map[string]string{
 	KeyUpdateInterval:  "12",
 	KeyWGPoolEnabled:   "0",
 	KeyInstalled:       "0",
+	KeySubpageEnabled:  "0",
 }
 
 // settingsCache держит настройки в памяти: их читают на каждом запросе подписки,
