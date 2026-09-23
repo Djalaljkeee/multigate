@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"encoding/json"
 	"log/slog"
 	"net/http"
 	"strings"
@@ -219,4 +220,36 @@ func itoa(n int) string {
 		n /= 10
 	}
 	return string(b[i:])
+}
+
+func (h *panelHolder) UserByUsername(ctx context.Context, username string) (model.PanelUser, error) {
+	c, err := h.client()
+	if err != nil {
+		return model.PanelUser{}, err
+	}
+	return c.UserByUsername(ctx, username)
+}
+
+func (h *panelHolder) SubscriptionInfo(ctx context.Context, shortUUID string) (model.SubInfo, error) {
+	c, err := h.client()
+	if err != nil {
+		return model.SubInfo{}, err
+	}
+	return c.SubscriptionInfo(ctx, shortUUID)
+}
+
+func (h *panelHolder) SubpageRef(ctx context.Context, shortUUID string, in http.Header) (model.SubpageRef, error) {
+	c, err := h.client()
+	if err != nil {
+		return model.SubpageRef{}, err
+	}
+	return c.SubpageRef(ctx, shortUUID, in)
+}
+
+func (h *panelHolder) SubpageConfig(ctx context.Context, uuid string) (json.RawMessage, error) {
+	c, err := h.client()
+	if err != nil {
+		return nil, err
+	}
+	return c.SubpageConfig(ctx, uuid)
 }

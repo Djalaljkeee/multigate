@@ -75,7 +75,7 @@ func funcMap() template.FuncMap {
 		// в шаблонах Go нет литерала для среза, только встроенный slice()
 		// для среза УЖЕ существующего значения, поэтому список строится в коде.
 		"decisionOptions": func() []string {
-			return []string{"normal", "blocked", "expired", "notfound", "decoy", "error"}
+			return []string{"normal", "page", "blocked", "expired", "notfound", "decoy", "error"}
 		},
 		"statusClass": func(status int) string {
 			switch {
@@ -142,6 +142,8 @@ func decisionRU(d string) string {
 		return "истёк срок"
 	case "notfound":
 		return "не найден"
+	case "page":
+		return "страница подписки"
 	case "decoy":
 		return "маскировка"
 	case "error":

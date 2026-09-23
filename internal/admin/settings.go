@@ -55,6 +55,11 @@ type settingsForm struct {
 
 	// WireGuard.
 	WGPoolEnabled bool
+
+	// Страница подписки и старые ссылки Marzban.
+	SubpageEnabled       bool
+	SubpageLogoURL       string
+	MarzbanLegacyKeysSet bool
 }
 
 // settingsPageData: данные вкладки «Настройки».
@@ -115,6 +120,10 @@ func (h *Handler) currentSettingsForm(r *http.Request) settingsForm {
 		WebhookSecretSet: all[store.KeyWebhookSecret] != "",
 
 		WGPoolEnabled: isTrue(all[store.KeyWGPoolEnabled]),
+
+		SubpageEnabled:       isTrue(all[store.KeySubpageEnabled]),
+		SubpageLogoURL:       all[store.KeySubpageLogoURL],
+		MarzbanLegacyKeysSet: all[store.KeyMarzbanLegacyKeys] != "",
 	}
 }
 
@@ -148,6 +157,9 @@ func (h *Handler) handleSettingsSave(w http.ResponseWriter, r *http.Request, s *
 		ChatTGAPIBase: strings.TrimSpace(r.PostFormValue("chat_tg_api_base")),
 
 		WGPoolEnabled: r.PostFormValue("wg_pool_enabled") != "",
+
+		SubpageEnabled: r.PostFormValue("subpage_enabled") != "",
+		SubpageLogoURL: strings.TrimSpace(r.PostFormValue("subpage_logo_url")),
 	}
 
 	newToken := r.PostFormValue("panel_token")
@@ -164,6 +176,11 @@ func (h *Handler) handleSettingsSave(w http.ResponseWriter, r *http.Request, s *
 	clearWebhookSecret := r.PostFormValue("webhook_secret_clear") != ""
 	webhookSecretWasSet := h.store.Get(r.Context(), store.KeyWebhookSecret) != ""
 	form.WebhookSecretSet = (webhookSecretWasSet && !clearWebhookSecret) || newWebhookSecret != ""
+
+	newLegacyKeys := strings.TrimSpace(r.PostFormValue("marzban_legacy_keys"))
+	clearLegacyKeys := r.PostFormValue("marzban_legacy_keys_clear") != ""
+	legacyKeysWereSet := h.store.Get(r.Context(), store.KeyMarzbanLegacyKeys) != ""
+	form.MarzbanLegacyKeysSet = (legacyKeysWereSet && !clearLegacyKeys) || newLegacyKeys != ""
 
 	logKeepDays, errMsg := parsePositiveInt(form.LogKeepDays, "срок хранения журнала")
 	var cacheTTL, upstreamTimeout, updateInterval, graceHours int
@@ -193,6 +210,9 @@ func (h *Handler) handleSettingsSave(w http.ResponseWriter, r *http.Request, s *
 	}
 	if errMsg == "" && form.ChatTGAPIBase != "" && !isValidHTTPURL(form.ChatTGAPIBase) {
 		errMsg = "Адрес API Telegram должен быть корректным URL (http или https)"
+	}
+	if errMsg == "" && form.SubpageLogoURL != "" && !isValidHTTPURL(form.SubpageLogoURL) {
+		errMsg = "Адрес логотипа должен быть корректным URL (http или https)"
 	}
 	if errMsg == "" && form.ChatEnabled && form.ChatTGAPIBase == "" {
 		errMsg = "Для виджета чата нужен адрес API Telegram"
@@ -235,6 +255,9 @@ func (h *Handler) handleSettingsSave(w http.ResponseWriter, r *http.Request, s *
 		store.KeyChatTGAPIBase: form.ChatTGAPIBase,
 
 		store.KeyWGPoolEnabled: boolStr(form.WGPoolEnabled),
+
+		store.KeySubpageEnabled: boolStr(form.SubpageEnabled),
+		store.KeySubpageLogoURL: form.SubpageLogoURL,
 	}
 	switch {
 	case clearToken:
@@ -253,6 +276,13 @@ func (h *Handler) handleSettingsSave(w http.ResponseWriter, r *http.Request, s *
 		kv[store.KeyWebhookSecret] = ""
 	case newWebhookSecret != "":
 		kv[store.KeyWebhookSecret] = newWebhookSecret
+	}
+
+	switch {
+	case clearLegacyKeys:
+		kv[store.KeyMarzbanLegacyKeys] = ""
+	case newLegacyKeys != "":
+		kv[store.KeyMarzbanLegacyKeys] = newLegacyKeys
 	}
 
 	if err := h.store.SetMany(r.Context(), kv); err != nil {

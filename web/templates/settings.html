@@ -71,6 +71,26 @@
   </fieldset>
 
   <fieldset class="form-group">
+    <legend>Страница подписки</legend>
+    <label class="field-check">
+      <input type="checkbox" name="subpage_enabled" {{if .Form.SubpageEnabled}}checked{{end}}>
+      <span>Показывать браузеру по живой ссылке страницу с настройкой приложений (только режим панели). Приложения, шаги и тексты берутся из конфига страницы подписки в панели</span>
+    </label>
+    <label class="field">
+      <span>Логотип на странице (URL, пусто: из конфига панели)</span>
+      <input type="text" name="subpage_logo_url" value="{{.Form.SubpageLogoURL}}" placeholder="https://example.com/logo.svg">
+    </label>
+    <label class="field">
+      <span>Секреты Marzban для старых ссылок подписки (через запятую)</span>
+      <input type="password" name="marzban_legacy_keys" autocomplete="off" placeholder="{{if .Form.MarzbanLegacyKeysSet}}●●●●●●●● (оставьте пустым, чтобы не менять){{else}}не заданы{{end}}">
+    </label>
+    {{if .Form.MarzbanLegacyKeysSet}}<label class="field-check">
+      <input type="checkbox" name="marzban_legacy_keys_clear" value="1">
+      <span>Удалить секреты Marzban</span>
+    </label>{{end}}
+  </fieldset>
+
+  <fieldset class="form-group">
     <legend>Журнал запросов</legend>
     <label class="field-check">
       <input type="checkbox" name="log_enabled" {{if .Form.LogEnabled}}checked{{end}}>
