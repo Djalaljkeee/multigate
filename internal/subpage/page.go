@@ -39,6 +39,16 @@ const configTTL = 5 * time.Minute
 var ErrUnavailable = errors.New("subpage: страница недоступна")
 
 // Panel: то, что странице нужно от панели.
+// EmergencyTag: тег пользователя в панели, которым биллинг помечает
+// аварийный режим после неоплаты (урезанный доступ до удаления услуги).
+const EmergencyTag = "EMERGENCY"
+
+// userLookup не входит в Panel: тег нужен только для плашки аварийного
+// режима, и панель без него страницу всё равно отдаёт.
+type userLookup interface {
+	UserByShortUUID(ctx context.Context, shortUUID string) (model.PanelUser, error)
+}
+
 type Panel interface {
 	SubscriptionInfo(ctx context.Context, shortUUID string) (model.SubInfo, error)
 	SubpageRef(ctx context.Context, shortUUID string, in http.Header) (model.SubpageRef, error)
@@ -109,6 +119,13 @@ func (p *Page) Serve(w http.ResponseWriter, r *http.Request, shortUUID string, p
 	}
 
 	v := p.buildView(ctx, cfg, info, pickLang(r.Header.Get("Accept-Language"), cfg.Locales), platform)
+	if p.emergency(ctx, shortUUID) {
+		v.Emergency = true
+		v.Status, v.StatusClass = "Аварийный режим", "warn"
+		if renew := strings.TrimSpace(p.db.Get(ctx, store.KeySubpageRenewURL)); renew != "" {
+			v.RenewURL = safeURL(renew)
+		}
+	}
 
 	var buf bytes.Buffer
 	if err := pageTmpl.Execute(&buf, v); err != nil {
@@ -157,6 +174,21 @@ func (p *Page) config(ctx context.Context, uuid string) (*Config, error) {
 	return cfg, nil
 }
 
+// emergency сообщает, помечен ли пользователь тегом аварийного режима.
+// Ошибка панели плашку просто не показывает: страница важнее.
+func (p *Page) emergency(ctx context.Context, shortUUID string) bool {
+	lu, ok := p.panel.(userLookup)
+	if !ok {
+		return false
+	}
+	u, err := lu.UserByShortUUID(ctx, shortUUID)
+	if err != nil {
+		p.log.Warn("subpage: не получить тег пользователя", "err", err)
+		return false
+	}
+	return u.Tag == EmergencyTag
+}
+
 // ---- данные для шаблона ----
 
 type view struct {
@@ -168,6 +200,8 @@ type view struct {
 	T           map[string]string
 	Status      string
 	StatusClass string
+	Emergency   bool
+	RenewURL    template.URL
 	Expires     string
 	DaysLeft    string
 	Traffic     string
