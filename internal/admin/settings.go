@@ -59,6 +59,7 @@ type settingsForm struct {
 	// Страница подписки и старые ссылки Marzban.
 	SubpageEnabled       bool
 	SubpageLogoURL       string
+	SubpageRenewURL      string
 	MarzbanLegacyKeysSet bool
 }
 
@@ -123,6 +124,7 @@ func (h *Handler) currentSettingsForm(r *http.Request) settingsForm {
 
 		SubpageEnabled:       isTrue(all[store.KeySubpageEnabled]),
 		SubpageLogoURL:       all[store.KeySubpageLogoURL],
+		SubpageRenewURL:      all[store.KeySubpageRenewURL],
 		MarzbanLegacyKeysSet: all[store.KeyMarzbanLegacyKeys] != "",
 	}
 }
@@ -158,8 +160,9 @@ func (h *Handler) handleSettingsSave(w http.ResponseWriter, r *http.Request, s *
 
 		WGPoolEnabled: r.PostFormValue("wg_pool_enabled") != "",
 
-		SubpageEnabled: r.PostFormValue("subpage_enabled") != "",
-		SubpageLogoURL: strings.TrimSpace(r.PostFormValue("subpage_logo_url")),
+		SubpageEnabled:  r.PostFormValue("subpage_enabled") != "",
+		SubpageLogoURL:  strings.TrimSpace(r.PostFormValue("subpage_logo_url")),
+		SubpageRenewURL: strings.TrimSpace(r.PostFormValue("subpage_renew_url")),
 	}
 
 	newToken := r.PostFormValue("panel_token")
@@ -214,6 +217,9 @@ func (h *Handler) handleSettingsSave(w http.ResponseWriter, r *http.Request, s *
 	if errMsg == "" && form.SubpageLogoURL != "" && !isValidHTTPURL(form.SubpageLogoURL) {
 		errMsg = "Адрес логотипа должен быть корректным URL (http или https)"
 	}
+	if errMsg == "" && form.SubpageRenewURL != "" && !isValidHTTPURL(form.SubpageRenewURL) {
+		errMsg = "Адрес кнопки «Продлить» должен быть корректным URL (http или https)"
+	}
 	if errMsg == "" && form.ChatEnabled && form.ChatTGAPIBase == "" {
 		errMsg = "Для виджета чата нужен адрес API Telegram"
 	}
@@ -256,8 +262,9 @@ func (h *Handler) handleSettingsSave(w http.ResponseWriter, r *http.Request, s *
 
 		store.KeyWGPoolEnabled: boolStr(form.WGPoolEnabled),
 
-		store.KeySubpageEnabled: boolStr(form.SubpageEnabled),
-		store.KeySubpageLogoURL: form.SubpageLogoURL,
+		store.KeySubpageEnabled:  boolStr(form.SubpageEnabled),
+		store.KeySubpageLogoURL:  form.SubpageLogoURL,
+		store.KeySubpageRenewURL: form.SubpageRenewURL,
 	}
 	switch {
 	case clearToken:

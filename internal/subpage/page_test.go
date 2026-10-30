@@ -192,6 +192,61 @@ func TestServeSettingsOverrideBranding(t *testing.T) {
 	}
 }
 
+// taggedPanel отдаёт ещё и пользователя панели с тегом.
+type taggedPanel struct {
+	*fakePanel
+	tag    string
+	tagErr error
+}
+
+func (f *taggedPanel) UserByShortUUID(context.Context, string) (model.PanelUser, error) {
+	return model.PanelUser{Tag: f.tag}, f.tagErr
+}
+
+func TestServeEmergencyBanner(t *testing.T) {
+	db := openTestDB(t)
+	ctx := context.Background()
+
+	rec, err := serve(t, New(db, &taggedPanel{fakePanel: activePanel(), tag: EmergencyTag}, nil), model.PlatformUnknown)
+	if err != nil {
+		t.Fatal(err)
+	}
+	body := rec.Body.String()
+	for _, want := range []string{"Аварийный режим", `class="pill warn"`, "аварийный доступ: 5 ГБ через Нидерланды до 11.10.2026"} {
+		if !strings.Contains(body, want) {
+			t.Errorf("на странице нет %q", want)
+		}
+	}
+	if strings.Contains(body, ">Продлить<") {
+		t.Error("кнопка «Продлить» без адреса в настройках")
+	}
+
+	if err := db.Set(ctx, store.KeySubpageRenewURL, "https://lk.example.com"); err != nil {
+		t.Fatal(err)
+	}
+	rec, err = serve(t, New(db, &taggedPanel{fakePanel: activePanel(), tag: EmergencyTag}, nil), model.PlatformUnknown)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !strings.Contains(rec.Body.String(), `href="https://lk.example.com" target="_blank" rel="noopener noreferrer">Продлить<`) {
+		t.Error("нет кнопки «Продлить» с адресом из настроек")
+	}
+
+	// Другой тег или ошибка панели: обычная страница, без плашки.
+	for _, tp := range []*taggedPanel{
+		{fakePanel: activePanel(), tag: "VIP"},
+		{fakePanel: activePanel(), tag: EmergencyTag, tagErr: errors.New("boom")},
+	} {
+		rec, err := serve(t, New(db, tp, nil), model.PlatformUnknown)
+		if err != nil {
+			t.Fatal(err)
+		}
+		if b := rec.Body.String(); strings.Contains(b, "Аварийный режим") || !strings.Contains(b, `class="pill ok"`) {
+			t.Errorf("тег %q (err %v): плашка аварийного режима не к месту", tp.tag, tp.tagErr)
+		}
+	}
+}
+
 func TestServeUnavailable(t *testing.T) {
 	db := openTestDB(t)
 
