@@ -60,6 +60,9 @@ const (
 	// KeySubpageLogoURL: логотип на странице подписки; пусто, значит
 	// logoUrl из конфига страницы в панели.
 	KeySubpageLogoURL = "subpage_logo_url"
+	// KeySubpageRenewURL: куда ведёт кнопка «Продлить» на плашке аварийного
+	// режима; пусто, значит плашка без кнопки.
+	KeySubpageRenewURL = "subpage_renew_url"
 )
 
 // defaults: значения, с которыми прослойка стартует на пустой базе.

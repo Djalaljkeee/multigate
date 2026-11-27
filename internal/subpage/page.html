@@ -88,6 +88,10 @@ svg{display:block}
 .pill.ok{color:var(--ok);background:rgba(94,230,168,.10)}
 .pill.warn{color:var(--warn);background:rgba(255,198,107,.10)}
 .pill.bad{color:var(--bad);background:rgba(255,122,147,.10)}
+.emergency{margin-top:14px;padding:13px 15px;border-radius:14px;border:1px solid rgba(255,198,107,.35);
+  background:rgba(255,198,107,.08);font-size:14px;line-height:1.5}
+.emergency b{color:var(--warn)}
+.emergency .btn{margin-top:11px}
 .stats{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .stat{padding:13px 14px;border-radius:16px;background:rgba(255,255,255,.035);border:1px solid rgba(255,210,248,.06)}
 .stat .k{font-size:12px;color:var(--faint);margin-bottom:3px}
@@ -190,6 +194,11 @@ svg{display:block}
         {{if .Limited}}<div class="bar"><i style="width:{{.TrafficPct}}%"></i></div>{{end}}
       </div>
     </div>
+    {{if .Emergency}}<div class="emergency">
+      <b>Подписка закончилась.</b> Пока работает аварийный доступ: 5 ГБ через Нидерланды до {{.Expires}}.
+      Продлите подписку — все серверы вернутся сразу после оплаты.
+      {{if .RenewURL}}<div><a class="btn primary" href="{{.RenewURL}}" target="_blank" rel="noopener noreferrer">Продлить</a></div>{{end}}
+    </div>{{end}}
   </section>
 
   <section class="card">

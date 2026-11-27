@@ -81,6 +81,10 @@
       <input type="text" name="subpage_logo_url" value="{{.Form.SubpageLogoURL}}" placeholder="https://example.com/logo.svg">
     </label>
     <label class="field">
+      <span>Кнопка «Продлить» на плашке аварийного режима (URL, пусто: без кнопки). Плашку видят пользователи с тегом EMERGENCY в панели</span>
+      <input type="text" name="subpage_renew_url" value="{{.Form.SubpageRenewURL}}" placeholder="https://lk.example.com">
+    </label>
+    <label class="field">
       <span>Секреты Marzban для старых ссылок подписки (через запятую)</span>
       <input type="password" name="marzban_legacy_keys" autocomplete="off" placeholder="{{if .Form.MarzbanLegacyKeysSet}}●●●●●●●● (оставьте пустым, чтобы не менять){{else}}не заданы{{end}}">
     </label>
